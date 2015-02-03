@@ -82,6 +82,7 @@
          */
         cy.on('drag', 'node', {}, function(evt){
             var node = evt.cyTarget;
+
             var neighborEdgeNodes = node.neighborhood('#edgeNode');
             for(var i = 0; i < neighborEdgeNodes.length; ++i)
             {
@@ -127,12 +128,16 @@
             when nodes will be deselected with a click
         */
         cy.on('select', 'node', {}, function(evt) {
-            console.log("selected");
-            selectedItems++;
+            if(evt.cyTarget.data("isSelected") != true) {
+                evt.cyTarget.data("isSelected", true);
+                selectedItems++;
+            }
         });
         cy.on('unselect', '', {}, function(evt) {
-            console.log("unselected");
-            selectedItems--;
+            for(var i = 0; i < evt.cyTarget.length; ++i)
+                evt.cyTarget[i].data("isSelected", false);
+
+            selectedItems -= evt.cyTarget.length;
             if(selectedItems == 0)
                 NODES_DESELECTED_STATE = true;
         });
