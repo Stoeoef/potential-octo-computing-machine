@@ -101,27 +101,66 @@
          *   Mouse the mouse to change the size.
          *   Click a second time to set the size.
          */
+        var EDGE_TO_BE_INSERTED_STATE = false;
         var NODE_RESIZE_STATE = false;
-        var selectedItems = 0;
         var NODES_DESELECTED_STATE = false;
+        var selectedItems = 0;
         cy.on('click', '', {}, function(evt) {
-            if(NODES_DESELECTED_STATE) {
-                NODES_DESELECTED_STATE = false;
+            console.log(evt.cyTarget);
+            if(EDGE_TO_BE_INSERTED_STATE)
+            {
+                if(isNode(evt.cyTarget))
+                {
+                    var edge = cy.$('#edgeNodeToBeInserted').neighborhood('edge');
+                    if(edge.source().id() != evt.cyTarget.id())
+                        edge.move({ target: evt.cyTarget.id() });
+                }
+
+                cy.$('#edgeNodeToBeInserted').remove();
+                EDGE_TO_BE_INSERTED_STATE = false;
                 return;
             }
 
-            if(!NODE_RESIZE_STATE && !isNode(evt.cyTarget)) {
-                cy.add({
-                    group: "nodes",
-                    data: {},
-                    position: {x: evt.cyPosition.x, y: evt.cyPosition.y}
-                });
-                NODE_RESIZE_STATE = true;
-            } else {
-                NODE_RESIZE_STATE = false;
-                lastMousePosition = null;
+            var button = evt.originalEvent.button;
+            if(button) //middle mouse button
+            {
+                if(isNode(evt.cyTarget))
+                {
+                    cy.add({
+                        group: "nodes",
+                        data: {id: "edgeNodeToBeInserted"},
+                        position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
+                        css: {'background-color': '#ffaaaa', width: '0px', height: '0px'}
+                    });
+                    cy.add({
+                        group: "edges",
+                        data: {source: evt.cyTarget.id(), target: 'edgeNodeToBeInserted'},
+                        position: {x: evt.cyPosition.x, y: evt.cyPosition.y}
+                    });
+
+                    EDGE_TO_BE_INSERTED_STATE = true;
+                }
+            } else { //left mouse button
+                if(NODES_DESELECTED_STATE) {
+                    NODES_DESELECTED_STATE = false;
+                    return;
+                }
+
+                if(!NODE_RESIZE_STATE && !isNode(evt.cyTarget)) {
+                    cy.add({
+                        group: "nodes",
+                        data: {},
+                        position: {x: evt.cyPosition.x, y: evt.cyPosition.y}
+                    });
+                    NODE_RESIZE_STATE = true;
+                } else {
+                    NODE_RESIZE_STATE = false;
+                    lastMousePosition = null;
+                }
             }
         });
+
+        cy.on('click')
 
         /*
             keep track of the current selected nodes to disable the "add node" functionality
@@ -144,6 +183,15 @@
 
         var lastMousePosition = null;
         cy.on('mousemove ', '', {}, function(evt){
+            if(EDGE_TO_BE_INSERTED_STATE)
+            {
+                var node = cy.$('#edgeNodeToBeInserted');
+                node.position().x = evt.cyPosition.x;
+                node.position().y = evt.cyPosition.y;
+                console.log(node.position());
+                cy.forceRender();
+            }
+
            if(NODE_RESIZE_STATE)
            {
                var newPosition = evt.cyPosition;
