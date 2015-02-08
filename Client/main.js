@@ -27,6 +27,16 @@
             selectable: true,
             layout: {name: 'preset'},
             style: cytoscape.stylesheet()
+                .selector("node")
+                .css({
+                    "overlay-opacity": 0,
+                    "shape": "rectangle",
+                    "background-color": "black",
+                    'text-valign': 'center',
+                    'color': 'white',
+                    'text-outline-width': 2,
+                    'text-outline-color': '#888'
+                })
                 .selector('edge')
                 .css({
                     'width': 6,
@@ -35,7 +45,7 @@
                 })
                 .selector('#edgeNode')
                 .css({
-                    'width': '6px',
+                    'width': '10px',
                     'height': '6px',
                     'background-color': '#ffaaaa'
                 })
@@ -45,12 +55,6 @@
                     "selection-box-opacity": 0,
                     "active-bg-color": "red",
                     "active-bg-opacity": 0 //disable pointer
-                })
-                .selector("node")
-                .css({
-                    "overlay-opacity": 0,
-                    "shape": "rectangle",
-                    "background-color": "black"
                 })
                 .selector("node:selected")
                 .css({
@@ -106,7 +110,6 @@
         var NODES_DESELECTED_STATE = false;
         var selectedItems = 0;
         cy.on('click', '', {}, function(evt) {
-            console.log(evt.cyTarget);
             if(EDGE_TO_BE_INSERTED_STATE)
             {
                 if(isNode(evt.cyTarget))
@@ -147,20 +150,22 @@
                 }
 
                 if(!NODE_RESIZE_STATE && !isNode(evt.cyTarget)) {
-                    cy.add({
+                    var node = cy.add({
                         group: "nodes",
                         data: {},
-                        position: {x: evt.cyPosition.x, y: evt.cyPosition.y}
+                        position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
+                        css: {'content': 'id()'}
                     });
+                    node.css('content', node.id());
+                    makeSpace(node);
                     NODE_RESIZE_STATE = true;
                 } else {
                     NODE_RESIZE_STATE = false;
                     lastMousePosition = null;
+                    saveNodePositions();
                 }
             }
         });
-
-        cy.on('click')
 
         /*
             keep track of the current selected nodes to disable the "add node" functionality
@@ -188,7 +193,6 @@
                 var node = cy.$('#edgeNodeToBeInserted');
                 node.position().x = evt.cyPosition.x;
                 node.position().y = evt.cyPosition.y;
-                console.log(node.position());
                 cy.forceRender();
             }
 
@@ -204,6 +208,7 @@
                     node.css("width", node.width() + diffX + "px");
                     node.css("height", node.height() + diffY + "px");
 
+                    makeSpace(node);
                 }
                lastMousePosition = newPosition;
            }
@@ -211,6 +216,93 @@
 
         function isNode(target) {
             return target.isNode != undefined && target.isNode();
+        }
+
+        var nodePositions = [];
+        function saveNodePositions()
+        {
+            var nodes = cy.elements('node');
+            nodePositions = [];
+            for(var i = 0; i < nodes.length; ++i)
+            {
+                nodePositions.push({
+                    id: nodes[i].id(),
+                    position: nodes[i].position(),
+                    width: nodes[i].width(),
+                    height: nodes[i].height()
+                });
+            }
+            console.log(nodePositions);
+        }
+
+        var MINIMUM_SPACE_BETWEEN_NODES = 20;
+        function makeSpace(node)
+        {
+            console.log("--------------MAKE SPACE--------------")
+            console.log(nodePositions);
+            console.log(node.width());
+            var nodes = nodePositions;
+            if(nodes.length < 0)
+                return;
+
+            var nodePosition = node.position();
+            var leftBoundary = nodePosition.x - node.width() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var rightBoundary = nodePosition.x + node.width() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+            var topBoundary = nodePosition.y - node.height() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var bottomBoundary = nodePosition.y + node.height() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+
+            var closestLeft, closestRight, closestTop, closestBottom;
+            for(var i = 0; i < nodes.length; ++i)
+            {
+                if(nodes[i].id == node.id()) {
+                    console.log("continue");
+                    continue;
+                }
+
+                var horizontalDistance = nodePosition.x - nodes[i].position.x;
+                var verticalDistance = nodePosition.y - nodes[i].position.y;
+                if(horizontalDistance >= 0 && (closestLeft == undefined || closestLeft.dist > horizontalDistance))
+                    closestLeft = {node: nodes[i], dist: horizontalDistance};
+
+                if(horizontalDistance < 0 && (closestRight == undefined || closestRight.dist < horizontalDistance))
+                    closestRight = {node: nodes[i], dist: horizontalDistance};
+
+                console.log(closestLeft);
+                console.log(closestRight);
+                //todo top bottom
+            }
+
+            var translationLeft = 0, translationRight = 0, translationTop = 0, translationBottom = 0;
+            if(closestLeft) {
+                var closestNodeLeftBoundary = closestLeft.node.position.x + closestLeft.node.width;
+                if (closestNodeLeftBoundary > leftBoundary)
+                    translationLeft = leftBoundary - closestNodeLeftBoundary;
+            }
+
+            if(closestRight) {
+                var closestNodeRightBoundary = closestRight.node.position.x - closestRight.node.width;
+                if (closestNodeRightBoundary < rightBoundary)
+                    translationRight = rightBoundary - closestNodeRightBoundary;
+            }
+
+
+
+            for(var i = 0; i < nodes.length; ++i)
+            {
+
+                if(nodes[i].id == node.id())
+                    continue;
+
+                var curPos = nodes[i].position;
+                if(curPos.x < nodePosition.x) {
+                    cy.$("#" + nodes[i].id).position().x = nodes[i].position.x + translationLeft;
+                }
+                else {
+                    cy.$("#" + nodes[i].id).position().x = nodes[i].position.x + translationRight;
+                }
+            }
+
+            console.log("--------------------------------------");
         }
     }]);
 }());
