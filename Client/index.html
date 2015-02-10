@@ -20,6 +20,13 @@
         float: left;
     }
 
+    .nodeText{
+        position: absolute;
+        background-color: blue;
+        pointer-events:none;
+        opacity: 0.5;
+    }
+
     .invisibleNode{
         width: 0px;
         height: 0px;
@@ -36,9 +43,12 @@
     }
 
 </style>
-<body ng-app="GraphClientApp" ng-controller="MainController">
+<body ng-app="GraphClientApp">
+<div ng-controller="MainController">
     <div id="mainDiv">
         <div id="cy"></div>
+        <div class="nodeText" ng-repeat="node in nodes" ng-style="node.style">{{ node }}</div>
     </div>
+</div>
 </body>
 </html>

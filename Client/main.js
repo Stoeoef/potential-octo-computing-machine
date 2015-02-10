@@ -1,3 +1,4 @@
+var scope;
 (function(){
     var app = angular.module("GraphClientApp", []);
     app.controller("MainController", ["$scope", "$http", function($scope, $http) {
@@ -5,7 +6,6 @@
         var cy = cytoscape({
             container: document.getElementById('cy'),
             ready: function () {
-
                 /* ENABLE CUSTOM CANVAS TO DRAW CUSTOM STUFF
                     var customCanvasRaw = document.createElement("canvas");
                     ctx = customCanvasRaw.getContext("2d");
@@ -31,7 +31,7 @@
                 .css({
                     "overlay-opacity": 0,
                     "shape": "rectangle",
-                    "background-color": "black",
+                    "background-color": "#F5BCA9",
                     'text-valign': 'center',
                     'color': 'white',
                     'text-outline-width': 2,
@@ -98,6 +98,7 @@
                     edgeNode.position().x = node.position().x;
                 }
             }
+            saveNodePositions();
         });
 
         /*
@@ -154,7 +155,7 @@
                         group: "nodes",
                         data: {},
                         position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
-                        css: {'content': 'id()'}
+                        css: {'content': ''}
                     });
                     node.css('content', node.id());
                     makeSpace(node);
@@ -211,7 +212,16 @@
                     makeSpace(node);
                 }
                lastMousePosition = newPosition;
+               updateNodeStyle();
            }
+        });
+
+        cy.on('zoom', '', {}, function() {
+            saveNodePositions();
+        });
+
+        cy.on('pan', '', {}, function() {
+           updateNodeStyle();
         });
 
         function isNode(target) {
@@ -226,22 +236,50 @@
             for(var i = 0; i < nodes.length; ++i)
             {
                 var pos = nodes[i].position();
+                var renPos = nodes[i].renderedPosition();
+                console.log(pos);
+                console.log(renPos);
+                var w = nodes[i].width();
+                var h = nodes[i].height();
+                console.log(cy.zoom());
                 nodePositions.push({
                     id: nodes[i].id(),
                     position: {x: pos.x, y: pos.y},
-                    width: nodes[i].width(),
-                    height: nodes[i].height()
+                    width: w,
+                    height: h
                 });
             }
-            console.log(nodePositions);
+            updateNodeStyle();
+
+            $scope.nodes = nodePositions;
+            $scope.$apply();
+        }
+
+        function updateNodeStyle() {
+            var nodes = cy.elements('node');
+            for(var i = 0; i < nodePositions.length; ++i)
+            {
+                if(nodePositions[i].id == nodes[i].id())
+                {
+                    var renPos = nodes[i].renderedPosition();
+                    var w = nodes[i].width();
+                    var h = nodes[i].height();
+                    nodePositions[i].style = {
+                        "left": renPos.x - (w * cy.zoom()) / 2,
+                        "top": renPos.y - (h * cy.zoom()) / 2,
+                        "width": w * cy.zoom(),
+                        "height": h * cy.zoom()
+                    };
+                } else {
+                    console.log("WRONG ID"); // should not happen
+                }
+            }
+            $scope.$apply();
         }
 
         var MINIMUM_SPACE_BETWEEN_NODES = 30;
         function makeSpace(node)
         {
-            console.log("--------------MAKE SPACE--------------")
-            console.log(nodePositions);
-            console.log(node.width());
             var nodes = nodePositions;
             if(nodes.length < 0)
                 return;
@@ -252,15 +290,10 @@
             var topBoundary = nodePosition.y - node.height() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
             var bottomBoundary = nodePosition.y + node.height() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
 
-            console.log("bondaries");
-            console.log([leftBoundary, rightBoundary]);
-            console.log("bondaries end");
-
             var closestLeft, closestRight, closestBottom, closestTop;
             for(var i = 0; i < nodes.length; ++i)
             {
                 if(nodes[i].id == node.id()) {
-                    console.log("continue");
                     continue;
                 }
 
@@ -278,55 +311,32 @@
 
                 if(verticalDistance < 0 && (closestBottom == undefined || closestBottom.dist < verticalDistance))
                     closestBottom = {node: nodes[i], dist: verticalDistance};
-
-
-
-                console.log("closest");
-                console.log(closestLeft);
-                console.log(closestRight);
-                console.log(closestTop);
-                console.log(closestBottom);
-                console.log("closest end")
-
-                //todo top bottom
             }
 
-            console.log("closest node positions");
             var translationLeft = 0, translationRight = 0, translationTop = 0, translationBottom = 0;
             if(closestLeft) {
-                console.log(closestLeft.node.position.x);
                 var closestNodeLeftBoundary = closestLeft.node.position.x + closestLeft.node.width / 2;
                 if (closestNodeLeftBoundary > leftBoundary)
                     translationLeft = leftBoundary - closestNodeLeftBoundary;
             }
 
             if(closestRight) {
-                console.log(closestRight.node.position.x);
                 var closestNodeRightBoundary = closestRight.node.position.x - closestRight.node.width / 2;
                 if (closestNodeRightBoundary < rightBoundary)
                     translationRight = rightBoundary - closestNodeRightBoundary;
             }
 
             if(closestTop) {
-                console.log(closestTop.node.position.y);
                 var closestNodeTopBoundary = closestTop.node.position.y + closestTop.node.height / 2;
                 if (closestNodeTopBoundary > topBoundary)
                     translationTop = topBoundary - closestNodeTopBoundary;
             }
 
             if(closestBottom) {
-                console.log(closestBottom.node.position.y);
                 var closestNodeBottomBoundary = closestBottom.node.position.y - closestBottom.node.height / 2;
                 if (closestNodeBottomBoundary < bottomBoundary)
                     translationBottom = bottomBoundary - closestNodeBottomBoundary;
             }
-
-            console.log("closest node positions end");
-
-            console.log(translationLeft);
-            console.log(translationRight);
-            console.log(translationTop);
-            console.log(translationBottom);
 
 
             for(var i = 0; i < nodes.length; ++i)
@@ -350,8 +360,6 @@
                     cy.$("#" + nodes[i].id).position().y = nodes[i].position.y + translationBottom;
                 }
             }
-
-            console.log("--------------------------------------");
         }
     }]);
 }());
