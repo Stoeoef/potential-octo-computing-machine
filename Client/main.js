@@ -79,8 +79,6 @@ var scope;
             }
         });
 
-
-
         /*
             Move edges orthogonal when a node is dragged.
          */
@@ -153,7 +151,7 @@ var scope;
                 if(!NODE_RESIZE_STATE && !isNode(evt.cyTarget)) {
                     var node = cy.add({
                         group: "nodes",
-                        data: {},
+                        data: {'title': 'title', 'desc': 'description'},
                         position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
                         css: {'content': ''}
                     });
@@ -177,6 +175,15 @@ var scope;
                 evt.cyTarget.data("isSelected", true);
                 selectedItems++;
             }
+
+            if(selectedItems == 1) {
+                $scope.singleNodeSelected = cy.elements('node:selected').first();
+            } else {
+                $scope.singleNodeSelected = null;
+            }
+            $scope.$apply();
+
+
         });
         cy.on('unselect', '', {}, function(evt) {
             for(var i = 0; i < evt.cyTarget.length; ++i)
@@ -185,6 +192,11 @@ var scope;
             selectedItems -= evt.cyTarget.length;
             if(selectedItems == 0)
                 NODES_DESELECTED_STATE = true;
+
+            if(selectedItems != 1) {
+                $scope.singleNodeSelected = null;
+                $scope.$apply();
+            }
         });
 
         var lastMousePosition = null;

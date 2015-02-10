@@ -20,6 +20,12 @@
         float: left;
     }
 
+    .sidebar {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
     .nodeText{
         position: absolute;
         background-color: blue;
@@ -47,7 +53,16 @@
 <div ng-controller="MainController">
     <div id="mainDiv">
         <div id="cy"></div>
-        <div class="nodeText" ng-repeat="node in nodes" ng-style="node.style">{{ node }}</div>
+        <div class="nodeText" ng-repeat="node in nodes" ng-style="node.style">
+            <p>{{ node.title }}</p>
+            <p>{{ node.description }}</p>
+        </div>
+        <div class="sidebar" ng-show="singleNodeSelected">
+            <table cellspacing="0">
+                <tr><td>Title:</td><td><input type="text" value="{{ singleNodeSelected.data('title') }}"></td></tr>
+                <tr><td>Description:</td><td><textarea>{{ singleNodeSelected.data('desc') }}</textarea></td></tr>
+            </table>
+        </div>
     </div>
 </div>
 </body>
