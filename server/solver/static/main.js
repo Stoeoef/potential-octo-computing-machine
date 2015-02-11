@@ -102,7 +102,6 @@ var scope;
          */
         cy.on('drag', 'node', {}, function(evt){
             var node = evt.cyTarget;
-
             var neighborEdgeNodes = node.neighborhood('#edgeNode');
             for(var i = 0; i < neighborEdgeNodes.length; ++i)
             {
@@ -125,8 +124,12 @@ var scope;
         var EDGE_TO_BE_INSERTED_STATE = false;
         var NODE_RESIZE_STATE = false;
         var NODES_DESELECTED_STATE = false;
+        var PANNING_STATE = false;
         var selectedItems = 0;
         cy.on('click', '', {}, function(evt) {
+            if(PANNING_STATE)
+                return;
+
             if(EDGE_TO_BE_INSERTED_STATE)
             {
                 if(isNode(evt.cyTarget))
@@ -221,6 +224,11 @@ var scope;
 
         var lastMousePosition = null;
         cy.on('mousemove ', '', {}, function(evt){
+            //when the left mouse button is not pressed the user is not dragging
+            if(evt.originalEvent.which == 0) {
+                PANNING_STATE = false;
+            }
+
             if(EDGE_TO_BE_INSERTED_STATE)
             {
                 var node = cy.$('#edgeNodeToBeInserted');
@@ -254,6 +262,7 @@ var scope;
 
         cy.on('pan', '', {}, function() {
             console.log("pan");
+            PANNING_STATE = true;
             saveNodePositions();
             updateNodeTextStyle();
         });
