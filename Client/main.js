@@ -31,7 +31,7 @@ var scope;
                 .css({
                     "overlay-opacity": 0,
                     "shape": "rectangle",
-                    "background-color": "#F5BCA9",
+                    "background-color": "#F9BCAC",
                     'text-valign': 'center',
                     'color': 'white',
                     'text-outline-width': 2,
@@ -59,9 +59,7 @@ var scope;
                 .selector("node:selected")
                 .css({
                     "overlay-opacity": 0,
-                    "shape": "rectangle",
-                    "background-color": "blue",
-                    "border-color": "red"
+                    "shape": "rectangle"
                 }),
             elements: {
                 nodes: [
@@ -78,6 +76,18 @@ var scope;
                 showFps: false
             }
         });
+
+        $scope.setWidth = function() {
+            var node = cy.elements('node:selected').first();
+            node.css("width", nodeTexts[node.id()].style.width + "px");
+            updateNodeTextStyle();
+        }
+
+        $scope.setHeight = function() {
+            var node = cy.elements('node:selected').first();
+            node.css("height", nodeTexts[node.id()].style.height + "px");
+            updateNodeTextStyle();
+        }
 
         /*
             Move edges orthogonal when a node is dragged.
@@ -155,7 +165,7 @@ var scope;
                         position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
                         css: {'content': ''}
                     });
-                    node.css('content', node.id());
+                    //node.css('content', node.id());
                     makeSpace(node);
                     NODE_RESIZE_STATE = true;
                 } else {
@@ -177,7 +187,7 @@ var scope;
             }
 
             if(selectedItems == 1) {
-                $scope.singleNodeSelected = cy.elements('node:selected').first();
+                $scope.singleNodeSelected = nodeTexts[cy.elements('node:selected').first().id()];
             } else {
                 $scope.singleNodeSelected = null;
             }
@@ -185,7 +195,7 @@ var scope;
 
 
         });
-        cy.on('unselect', '', {}, function(evt) {
+        cy.on('unselect', 'node', {}, function(evt) {
             for(var i = 0; i < evt.cyTarget.length; ++i)
                 evt.cyTarget[i].data("isSelected", false);
 
@@ -224,7 +234,7 @@ var scope;
                     makeSpace(node);
                 }
                lastMousePosition = newPosition;
-               updateNodeStyle();
+               updateNodeTextStyle();
            }
         });
 
@@ -233,7 +243,7 @@ var scope;
         });
 
         cy.on('pan', '', {}, function() {
-           updateNodeStyle();
+            updateNodeTextStyle();
         });
 
         function isNode(target) {
@@ -241,6 +251,7 @@ var scope;
         }
 
         var nodePositions = [];
+        var nodeTexts = {};
         function saveNodePositions()
         {
             var nodes = cy.elements('node');
@@ -261,32 +272,43 @@ var scope;
                     height: h
                 });
             }
-            updateNodeStyle();
-
-            $scope.nodes = nodePositions;
-            $scope.$apply();
+            updateNodeTextStyle();
         }
 
-        function updateNodeStyle() {
+        function updateNodeTextStyle() {
             var nodes = cy.elements('node');
             for(var i = 0; i < nodePositions.length; ++i)
             {
                 if(nodePositions[i].id == nodes[i].id())
                 {
+                    //initial text
+                    if(nodeTexts[nodes[i].id()] == undefined) {
+                        nodeTexts[nodes[i].id()] = {
+                            title: "Title",
+                            description: "Description"
+                        };
+                    }
+
+                    //update style and positioning on the screen
                     var renPos = nodes[i].renderedPosition();
                     var w = nodes[i].width();
                     var h = nodes[i].height();
-                    nodePositions[i].style = {
+                    nodeTexts[nodePositions[i].id].style = {
                         "left": renPos.x - (w * cy.zoom()) / 2,
                         "top": renPos.y - (h * cy.zoom()) / 2,
                         "width": w * cy.zoom(),
                         "height": h * cy.zoom()
                     };
+
                 } else {
                     console.log("WRONG ID"); // should not happen
                 }
             }
-            $scope.$apply();
+            $scope.nodeTexts = nodeTexts;
+            console.log(nodeTexts);
+            if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
+                $scope.$apply();
+            }
         }
 
         var MINIMUM_SPACE_BETWEEN_NODES = 30;

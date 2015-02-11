@@ -28,9 +28,21 @@
 
     .nodeText{
         position: absolute;
-        background-color: blue;
         pointer-events:none;
-        opacity: 0.5;
+        color: black;
+        vertical-align: top;
+    }
+
+    .nodeTextTitle {
+        font-weight: bold;
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+
+    .nodeTextDescription {
+        margin: 0px;
+        padding: 0px;
     }
 
     .invisibleNode{
@@ -53,14 +65,18 @@
 <div ng-controller="MainController">
     <div id="mainDiv">
         <div id="cy"></div>
-        <div class="nodeText" ng-repeat="node in nodes" ng-style="node.style">
-            <p>{{ node.title }}</p>
-            <p>{{ node.description }}</p>
+        <div class="nodeText" ng-repeat="(nodeId, nodeText) in nodeTexts" ng-style="nodeText.style">
+            <p class="nodeTextTitle">{{ nodeText.title }}</p>
+            <p class="nodeTextDescription">{{ nodeText.description }}</p>
         </div>
         <div class="sidebar" ng-show="singleNodeSelected">
             <table cellspacing="0">
-                <tr><td>Title:</td><td><input type="text" value="{{ singleNodeSelected.data('title') }}"></td></tr>
-                <tr><td>Description:</td><td><textarea>{{ singleNodeSelected.data('desc') }}</textarea></td></tr>
+                <form>
+                    <tr><td>Title:</td><td><input type="text" ng-model="singleNodeSelected.title"></td></tr>
+                    <tr><td>Description:</td><td><textarea ng-model="singleNodeSelected.description"></textarea></td></tr>
+                    <tr><td>Width:</td><td><input ng-model="singleNodeSelected.style.width" ng-change="setWidth()"></td></tr>
+                    <tr><td>Height:</td><td><input ng-model="singleNodeSelected.style.height" ng-change="setHeight()"></td></tr>
+                </form>
             </table>
         </div>
     </div>
