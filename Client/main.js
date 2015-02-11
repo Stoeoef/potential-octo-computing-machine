@@ -24,6 +24,7 @@ var scope;
                     console.log(canvasContainer.append(customCanvas));
                 */
             },
+            zoomingEnabled: false,
             selectable: true,
             layout: {name: 'preset'},
             style: cytoscape.stylesheet()
@@ -330,10 +331,15 @@ var scope;
              */
             $scope.makeSpaceOverlay = {
                 style: {
-                    'topLeft': { 'width': leftBoundary + 'px', height: topBoundary + 'px', left: '0px', top: '0px' },
-                    'topRight': { 'width': cy.width() - rightBoundary + 'px', height: topBoundary + 'px', left: rightBoundary + 'px', top: '0px' },
-                    'bottomLeft': { 'width': leftBoundary + 'px', height: cy.height() - bottomBoundary + 'px', left: '0px', top: bottomBoundary + 'px' },
-                    'bottomRight': { 'width': cy.width() - rightBoundary + 'px', height: cy.height() - bottomBoundary + 'px', left: rightBoundary + 'px', top: bottomBoundary + 'px' }
+                    'topLeft': { 'width': leftBoundary + cy.pan().x + 'px', height: topBoundary  + cy.pan().y + 'px', left: '0px', top: '0px' },
+                    'topRight': { 'width': cy.width() - cy.pan().x - rightBoundary + 'px', height: topBoundary + cy.pan().y + 'px',
+                        left: rightBoundary + cy.pan().x + 'px', top: '0px' },
+                    'bottomLeft': { 'width': leftBoundary + cy.pan().x + 'px', height: cy.height() - + cy.pan().y + bottomBoundary + 'px',
+                        left: '0px', top: bottomBoundary + cy.pan().y + 'px' },
+                    'bottomRight': { 'width': cy.width() - rightBoundary - cy.pan().x + 'px',
+                        height: cy.height() - cy.pan().y - bottomBoundary + 'px',
+                        left: rightBoundary + cy.pan().x + 'px',
+                        top: bottomBoundary + cy.pan().y + 'px' }
                 }
             };
 
