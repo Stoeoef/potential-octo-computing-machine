@@ -1,0 +1,2 @@
+export LD_LIBRARY_PATH=/home/tinloaf/opt/gurobi/gurobi563/linux64/lib:
+export GRB_LICENSE_FILE=/home/tinloaf/opt/gurobi/gurobi.lic

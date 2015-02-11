@@ -1,0 +1,5 @@
+venv/*
+gurobi.log
+*.pyc
+*~
+server/db.sqlite3
