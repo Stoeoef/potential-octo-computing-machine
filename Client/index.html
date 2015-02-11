@@ -28,7 +28,8 @@
 
     .nodeText{
         position: absolute;
-        pointer-events:none;
+        z-index: 10;
+        pointer-events: none;
         color: black;
         vertical-align: top;
     }
@@ -60,6 +61,14 @@
         background-color: #ff734a;
     }
 
+    .makeSpaceOverlay {
+        position: absolute;
+        z-index: 11;
+        pointer-events: none;
+        background-color: black;
+        opacity: 0.1;
+    }
+
 </style>
 <body ng-app="GraphClientApp">
 <div ng-controller="MainController">
@@ -78,6 +87,12 @@
                     <tr><td>Height:</td><td><input ng-model="singleNodeSelected.style.height" ng-change="setHeight()"></td></tr>
                 </form>
             </table>
+        </div>
+        <div ng-hide="makeSpaceOverlay == null">
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.topLeft"></div>
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.topRight"></div>
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.bottomLeft"></div>
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.bottomRight"></div>
         </div>
     </div>
 </div>

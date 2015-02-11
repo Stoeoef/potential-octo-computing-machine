@@ -171,6 +171,7 @@ var scope;
                 } else {
                     NODE_RESIZE_STATE = false;
                     lastMousePosition = null;
+                    $scope.makeSpaceOverlay = null;
                     saveNodePositions();
                 }
             }
@@ -323,6 +324,18 @@ var scope;
             var rightBoundary = nodePosition.x + node.width() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
             var topBoundary = nodePosition.y - node.height() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
             var bottomBoundary = nodePosition.y + node.height() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+
+            /*
+             * compute overlay
+             */
+            $scope.makeSpaceOverlay = {
+                style: {
+                    'topLeft': { 'width': leftBoundary + 'px', height: topBoundary + 'px', left: '0px', top: '0px' },
+                    'topRight': { 'width': cy.width() - rightBoundary + 'px', height: topBoundary + 'px', left: rightBoundary + 'px', top: '0px' },
+                    'bottomLeft': { 'width': leftBoundary + 'px', height: cy.height() - bottomBoundary + 'px', left: '0px', top: bottomBoundary + 'px' },
+                    'bottomRight': { 'width': cy.width() - rightBoundary + 'px', height: cy.height() - bottomBoundary + 'px', left: rightBoundary + 'px', top: bottomBoundary + 'px' }
+                }
+            };
 
             var closestLeft, closestRight, closestBottom, closestTop;
             for(var i = 0; i < nodes.length; ++i)
