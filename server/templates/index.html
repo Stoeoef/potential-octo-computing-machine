@@ -1,0 +1,94 @@
+{% load staticfiles %}
+{% load dajaxice_templatetags %}
+
+<html>
+<head>
+    {% dajaxice_js_import %}
+    <script type="application/javascript" src="{% static 'cytoscape.js' %}"> </script>
+    <script type="application/javascript" src="{% static 'angular.js' %}"> </script>
+    <script type="application/javascript" src="{% static 'main.js' %}"> </script> 
+
+    <script type="application/javascript">
+        function testcb(data) {};
+
+        function test() {
+            data = {
+                'nodes': [
+                    {'id': '1', 'x': 1, 'y': 1, 'height': 10, 'width': 10},
+                    {'id': '2', 'x': 22, 'y': 1, 'height': 10, 'width': 30},
+                    {'id': '3', 'x': 1, 'y': 12, 'height': 10, 'width': 50},
+                ], 
+                'adjacencies': [
+                    ['1', '2'], ['2', '3'], ['1', '3'],
+                ], 
+                'added_node': '3'
+            }
+
+            Dajaxice.solver.optimize(testcb, {'data': data});
+        }
+    </script>
+</head>
+<style>
+    html body {
+        padding: 0;
+        margin: 0;
+    }
+    #cy {
+        height: 100%;
+        width: 100%;
+    }
+
+    #mainDiv {
+        height: 100%;
+        width: 100%;
+        float: left;
+    }
+
+    .sidebar {
+        position: absolute;
+        left: 0px;
+        top: 0px;
+    }
+
+    .nodeText{
+        position: absolute;
+        background-color: blue;
+        pointer-events:none;
+        opacity: 0.5;
+    }
+
+    .invisibleNode{
+        width: 0px;
+        height: 0px;
+    }
+
+    .lastAddedNode{
+        color: red;
+    }
+
+    .edgeNodeToBeInserted {
+        width: 6px;
+        height: 6px;
+        background-color: #ff734a;
+    }
+
+</style>
+<body ng-app="GraphClientApp">
+<div ng-controller="MainController">
+    <div id="mainDiv">
+        <div id="cy"></div>
+        <div class="nodeText" ng-repeat="node in nodes" ng-style="node.style">
+            <p>{{ node.title }}</p>
+            <p>{{ node.description }}</p>
+        </div>
+        <div class="sidebar" ng-show="singleNodeSelected">
+            <table cellspacing="0">
+                <tr><td>Title:</td><td><input type="text" value=""></td></tr>
+                <tr><td>Description:</td><td><textarea></textarea></td></tr>
+            </table>
+        </div>
+    </div>
+    <button onclick="test();">Test!</button>
+</div>
+</body>
+</html>
