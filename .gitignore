@@ -2,4 +2,5 @@ venv/*
 gurobi.log
 *.pyc
 *~
+.idea
 server/db.sqlite3
