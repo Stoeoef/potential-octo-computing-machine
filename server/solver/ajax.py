@@ -29,4 +29,4 @@ def optimize(request, data):
     ilp.prepare()
     ilp.optimize()
     
-    return ""
+    return json.dumps(ilp.solution())

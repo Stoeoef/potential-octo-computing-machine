@@ -83,9 +83,18 @@ class ILPBuilder(object):
             self.yvars[node.v] = self.ilp.addVar(vtype=g.GRB.CONTINUOUS, name="y_%s" % (node.v,))
         
         self.ilp.update()
+    
+    def solution(self):
+        positions = {}
+        for node in self.ds.nodes:
+            x = self.xvars[node.v].getAttr('x')
+            y = self.yvars[node.v].getAttr('x')
+            positions[node.v] = (x,y)
+        return positions
+            
         
     def _opt_callback(self, model, where):
-        if where != g.GRB.callback.MIPSOL:
+        if (where != g.GRB.callback.MIPSOL) and (where != g.GRB.callback.MIPNODE):
             return
         
         self.xvals = {}
