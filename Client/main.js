@@ -59,7 +59,8 @@ var scope;
                 .selector("node:selected")
                 .css({
                     "overlay-opacity": 0,
-                    "shape": "rectangle"
+                    "shape": "rectangle",
+                    "background-color": '#F7D4CB'
                 }),
             elements: {
                 nodes: [
@@ -244,6 +245,8 @@ var scope;
         });
 
         cy.on('pan', '', {}, function() {
+            console.log("pan");
+            saveNodePositions();
             updateNodeTextStyle();
         });
 
@@ -261,11 +264,8 @@ var scope;
             {
                 var pos = nodes[i].position();
                 var renPos = nodes[i].renderedPosition();
-                console.log(pos);
-                console.log(renPos);
                 var w = nodes[i].width();
                 var h = nodes[i].height();
-                console.log(cy.zoom());
                 nodePositions.push({
                     id: nodes[i].id(),
                     position: {x: pos.x, y: pos.y},
@@ -306,7 +306,6 @@ var scope;
                 }
             }
             $scope.nodeTexts = nodeTexts;
-            console.log(nodeTexts);
             if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
                 $scope.$apply();
             }
@@ -328,12 +327,16 @@ var scope;
             /*
              * compute overlay
              */
+            var leftOverlayBoundary = node.renderedPosition().x - node.width* cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var rightOverlayBoundary = node.renderedPosition().x + node.width() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+            var topOverlayBoundary = node.renderedPosition().y - node.height() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var bottomOverlayBoundary = node.renderedPosition().y + node.height() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
             $scope.makeSpaceOverlay = {
                 style: {
-                    'topLeft': { 'width': leftBoundary + 'px', height: topBoundary + 'px', left: '0px', top: '0px' },
-                    'topRight': { 'width': cy.width() - rightBoundary + 'px', height: topBoundary + 'px', left: rightBoundary + 'px', top: '0px' },
-                    'bottomLeft': { 'width': leftBoundary + 'px', height: cy.height() - bottomBoundary + 'px', left: '0px', top: bottomBoundary + 'px' },
-                    'bottomRight': { 'width': cy.width() - rightBoundary + 'px', height: cy.height() - bottomBoundary + 'px', left: rightBoundary + 'px', top: bottomBoundary + 'px' }
+                    'topLeft': { 'width': leftOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' },
+                    'topRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: '0px' },
+                    'bottomLeft': { 'width': leftOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' },
+                    'bottomRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: bottomOverlayBoundary + 'px' }
                 }
             };
 

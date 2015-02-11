@@ -1,6 +1,9 @@
 var scope;
 (function(){
     var app = angular.module("GraphClientApp", []);
+    app.config(function($interpolateProvider){
+        $interpolateProvider.startSymbol('[[').endSymbol(']]');
+    });
     app.controller("MainController", ["$scope", "$http", function($scope, $http) {
         var ctx = null;
         var cy = cytoscape({
@@ -23,6 +26,10 @@ var scope;
                     customCanvas.css("z-index", 3);
                     console.log(canvasContainer.append(customCanvas));
                 */
+                cy.pan({
+                    x: cy.width() / 2,
+                    y: cy.height() / 2
+                });
             },
             selectable: true,
             layout: {name: 'preset'},
@@ -31,7 +38,7 @@ var scope;
                 .css({
                     "overlay-opacity": 0,
                     "shape": "rectangle",
-                    "background-color": "#F5BCA9",
+                    "background-color": "#F9BCAC",
                     'text-valign': 'center',
                     'color': 'white',
                     'text-outline-width': 2,
@@ -60,8 +67,7 @@ var scope;
                 .css({
                     "overlay-opacity": 0,
                     "shape": "rectangle",
-                    "background-color": "blue",
-                    "border-color": "red"
+                    "background-color": '#F7D4CB'
                 }),
             elements: {
                 nodes: [
@@ -78,6 +84,18 @@ var scope;
                 showFps: false
             }
         });
+
+        $scope.setWidth = function() {
+            var node = cy.elements('node:selected').first();
+            node.css("width", nodeTexts[node.id()].style.width + "px");
+            updateNodeTextStyle();
+        }
+
+        $scope.setHeight = function() {
+            var node = cy.elements('node:selected').first();
+            node.css("height", nodeTexts[node.id()].style.height + "px");
+            updateNodeTextStyle();
+        }
 
         /*
             Move edges orthogonal when a node is dragged.
@@ -120,6 +138,7 @@ var scope;
 
                 cy.$('#edgeNodeToBeInserted').remove();
                 EDGE_TO_BE_INSERTED_STATE = false;
+                computeLayout();
                 return;
             }
 
@@ -155,12 +174,13 @@ var scope;
                         position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
                         css: {'content': ''}
                     });
-                    node.css('content', node.id());
+                    //node.css('content', node.id());
                     makeSpace(node);
                     NODE_RESIZE_STATE = true;
                 } else {
                     NODE_RESIZE_STATE = false;
                     lastMousePosition = null;
+                    $scope.makeSpaceOverlay = null;
                     saveNodePositions();
                 }
             }
@@ -177,7 +197,7 @@ var scope;
             }
 
             if(selectedItems == 1) {
-                $scope.singleNodeSelected = cy.elements('node:selected').first();
+                $scope.singleNodeSelected = nodeTexts[cy.elements('node:selected').first().id()];
             } else {
                 $scope.singleNodeSelected = null;
             }
@@ -185,7 +205,7 @@ var scope;
 
 
         });
-        cy.on('unselect', '', {}, function(evt) {
+        cy.on('unselect', 'node', {}, function(evt) {
             for(var i = 0; i < evt.cyTarget.length; ++i)
                 evt.cyTarget[i].data("isSelected", false);
 
@@ -224,7 +244,7 @@ var scope;
                     makeSpace(node);
                 }
                lastMousePosition = newPosition;
-               updateNodeStyle();
+               updateNodeTextStyle();
            }
         });
 
@@ -233,7 +253,9 @@ var scope;
         });
 
         cy.on('pan', '', {}, function() {
-           updateNodeStyle();
+            console.log("pan");
+            saveNodePositions();
+            updateNodeTextStyle();
         });
 
         function isNode(target) {
@@ -241,6 +263,7 @@ var scope;
         }
 
         var nodePositions = [];
+        var nodeTexts = {};
         function saveNodePositions()
         {
             var nodes = cy.elements('node');
@@ -249,11 +272,8 @@ var scope;
             {
                 var pos = nodes[i].position();
                 var renPos = nodes[i].renderedPosition();
-                console.log(pos);
-                console.log(renPos);
                 var w = nodes[i].width();
                 var h = nodes[i].height();
-                console.log(cy.zoom());
                 nodePositions.push({
                     id: nodes[i].id(),
                     position: {x: pos.x, y: pos.y},
@@ -261,32 +281,43 @@ var scope;
                     height: h
                 });
             }
-            updateNodeStyle();
-
-            $scope.nodes = nodePositions;
-            $scope.$apply();
+            updateNodeTextStyle();
         }
 
-        function updateNodeStyle() {
+        function updateNodeTextStyle() {
             var nodes = cy.elements('node');
             for(var i = 0; i < nodePositions.length; ++i)
             {
                 if(nodePositions[i].id == nodes[i].id())
                 {
+                    //initial text
+                    if(nodeTexts[nodes[i].id()] == undefined) {
+                        nodeTexts[nodes[i].id()] = {
+                            title: "Title",
+                            description: "Description"
+                        };
+                    }
+
+                    //update style and positioning on the screen
                     var renPos = nodes[i].renderedPosition();
                     var w = nodes[i].width();
                     var h = nodes[i].height();
-                    nodePositions[i].style = {
+                    nodeTexts[nodePositions[i].id].style = {
                         "left": renPos.x - (w * cy.zoom()) / 2,
                         "top": renPos.y - (h * cy.zoom()) / 2,
                         "width": w * cy.zoom(),
                         "height": h * cy.zoom()
                     };
+
                 } else {
                     console.log("WRONG ID"); // should not happen
                 }
             }
-            $scope.$apply();
+
+            $scope.nodeTexts = nodeTexts;
+            if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
+                $scope.$apply();
+            }
         }
 
         var MINIMUM_SPACE_BETWEEN_NODES = 30;
@@ -301,6 +332,23 @@ var scope;
             var rightBoundary = nodePosition.x + node.width() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
             var topBoundary = nodePosition.y - node.height() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
             var bottomBoundary = nodePosition.y + node.height() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+
+            /*
+             * compute overlay
+             */
+            var leftOverlayBoundary = node.renderedPosition().x - node.width() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var rightOverlayBoundary = node.renderedPosition().x + node.width() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+            var topOverlayBoundary = node.renderedPosition().y - node.height() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var bottomOverlayBoundary = node.renderedPosition().y + node.height() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+            $scope.makeSpaceOverlay = {
+                style: {
+                    'topLeft': { 'width': leftOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' },
+                    'topRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: '0px' },
+                    'bottomLeft': { 'width': leftOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' },
+                    'bottomRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: bottomOverlayBoundary + 'px' }
+                }
+            };
+            console.log(leftOverlayBoundary);
 
             var closestLeft, closestRight, closestBottom, closestTop;
             for(var i = 0; i < nodes.length; ++i)
@@ -373,5 +421,69 @@ var scope;
                 }
             }
         }
+
+        function computeLayout()
+        {
+            console.log("computeLayout");
+            console.log(exportToJSON());
+            function callback(data) {
+                var nodes = cy.elements('node');
+                for(var i = 0; i < nodes.length; ++i)
+                {
+                    var node = nodes[i];
+                    node.position().x = data[node.id()][0];
+                    node.position().y = data[node.id()][1];
+                }
+                saveNodePositions();
+                cy.forceRender();
+            };
+/*
+            data = {
+                'nodes': [
+                    {'id': 'n0', 'x': 1, 'y': 1, 'height': 10, 'width': 10},
+                    {'id': '2', 'x': 22, 'y': 1, 'height': 10, 'width': 30},
+                    {'id': '3', 'x': 1, 'y': 12, 'height': 10, 'width': 50},
+                ],
+                'adjacencies': [
+                    ['n0', '2'], ['2', '3'], ['n0', '3'],
+                ],
+                'added_node': '3'
+            }
+*/
+
+            Dajaxice.solver.optimize(callback, {'data': exportToJSON()});
+        }
+
+        function exportToJSON() {
+            var result = {
+                'nodes': [],
+                'adjacencies': [],
+                'added_node': cy.elements('node').last().id()
+            };
+            var nodes = cy.elements('node');
+            for(var i = 0; i < nodes.length; ++i)
+            {
+                var node = nodes[i];
+                result.nodes.push({
+                    'id': node.id(),
+                    'x': node.position().x,
+                    'y': node.position().y,
+                    'height': node.height(),
+                    'width': node.width()
+                });
+            }
+
+            var edges = cy.elements('edge');
+            for(var i = 0; i < edges.length; ++i)
+            {
+                var edge = edges[i];
+                result.adjacencies.push([
+                    edge.source().id(),
+                    edge.target().id()
+                ]);
+            }
+            return result;
+        }
+
     }]);
 }());

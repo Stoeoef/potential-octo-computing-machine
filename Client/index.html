@@ -8,6 +8,7 @@
     html body {
         padding: 0;
         margin: 0;
+        overflow: hidden;
     }
     #cy {
         height: 100%;
@@ -18,6 +19,7 @@
         height: 100%;
         width: 100%;
         float: left;
+        overflow: hidden;
     }
 
     .sidebar {
@@ -32,6 +34,7 @@
         pointer-events: none;
         color: black;
         vertical-align: top;
+        overflow: hidden;
     }
 
     .nodeTextTitle {
@@ -71,7 +74,7 @@
 
 </style>
 <body ng-app="GraphClientApp">
-<div ng-controller="MainController">
+<div ng-controller="MainController" style="overflow: hidden">
     <div id="mainDiv">
         <div id="cy"></div>
         <div class="nodeText" ng-repeat="(nodeId, nodeText) in nodeTexts" ng-style="nodeText.style">
