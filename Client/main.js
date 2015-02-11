@@ -24,6 +24,7 @@ var scope;
                     console.log(canvasContainer.append(customCanvas));
                 */
             },
+            zoomingEnabled: true,
             selectable: true,
             layout: {name: 'preset'},
             style: cytoscape.stylesheet()
@@ -327,7 +328,7 @@ var scope;
             /*
              * compute overlay
              */
-            var leftOverlayBoundary = node.renderedPosition().x - node.width* cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var leftOverlayBoundary = node.renderedPosition().x - node.width() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
             var rightOverlayBoundary = node.renderedPosition().x + node.width() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
             var topOverlayBoundary = node.renderedPosition().y - node.height() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
             var bottomOverlayBoundary = node.renderedPosition().y + node.height() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
