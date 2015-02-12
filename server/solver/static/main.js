@@ -245,6 +245,9 @@ var scope;
             } else {
                 $scope.singleNodeSelected = null;
             }
+
+            if(selectedItems > 1)
+                $scope.showAlignButtons = true;
             $scope.$apply();
 
 
@@ -261,6 +264,9 @@ var scope;
                 $scope.singleNodeSelected = null;
                 $scope.$apply();
             }
+
+            if(selectedItems < 1)
+                $scope.showAlignButtons = false;
         });
 
         var lastMousePosition = null;
@@ -480,8 +486,8 @@ var scope;
                 for(var i = 0; i < nodes.length; ++i)
                 {
                     var node = nodes[i];
-                    node.position().x = data[node.id()][0];
-                    node.position().y = data[node.id()][1];
+                    node.position().x = data[node.id()][0] + node.width() / 2;
+                    node.position().y = data[node.id()][1] + node.height() / 2;
                 }
                 saveNodePositions();
                 cy.forceRender();

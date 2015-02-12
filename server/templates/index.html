@@ -90,7 +90,9 @@
             <p class="nodeTextDescription">[[ nodeText.description ]]</p>
         </div>
         <div class="sidebar">
-            <button ng-show="showComputeLayoutButton" ng-click="computeLayout()">ComputeLayout</button>
+            <button ng-show="showComputeLayoutButton" ng-click="computeLayout()">ComputeLayout</button><br>
+            <button ng-show="showAlignButtons" ng-click="alignX()">Align X</button><br>
+            <button ng-show="showAlignButtons" ng-click="alignY()">Align Y</button><br>
             <table cellspacing="0" ng-show="singleNodeSelected">
                 <form>
                     <tr><td>Title:</td><td><input type="text" ng-model="singleNodeSelected.title"></td></tr>
