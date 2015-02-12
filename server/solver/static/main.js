@@ -95,6 +95,12 @@ var scope;
                 lastJSONExport.nodes[i]['y_post'] = nodes[i].position().y - nodes[i].height() / 2;
                 lastJSONExport.nodes[i]['width'] = nodes[i].width();
                 lastJSONExport.nodes[i]['height'] = nodes[i].height();
+
+                if(lastJSONExport['added_node'] == nodes[i].id())
+                {
+                    lastJSONExport.nodes[i].x =  lastJSONExport.nodes[i]['x_post'];
+                    lastJSONExport.nodes[i].y =  lastJSONExport.nodes[i]['y_post'];
+                }
             }
 
             lastJSONExport.adjacencies = [];
