@@ -91,8 +91,10 @@ var scope;
             var nodes = cy.elements('node');
             for(var i = 0; i < nodes.length; ++i)
             {
-                lastJSONExport.nodes[i]['post_x'] = nodes[i].position().x - nodes[i].width() / 2;
-                lastJSONExport.nodes[i]['post_y'] = nodes[i].position().y - nodes[i].height() / 2;
+                lastJSONExport.nodes[i]['x_post'] = nodes[i].position().x - nodes[i].width() / 2;
+                lastJSONExport.nodes[i]['y_post'] = nodes[i].position().y - nodes[i].height() / 2;
+                lastJSONExport.nodes[i]['width'] = nodes[i].width();
+                lastJSONExport.nodes[i]['height'] = nodes[i].height();
             }
 
             lastJSONExport.adjacencies = [];
