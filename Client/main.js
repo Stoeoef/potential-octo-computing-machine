@@ -24,7 +24,7 @@ var scope;
                     console.log(canvasContainer.append(customCanvas));
                 */
             },
-            zoomingEnabled: false,
+            zoomingEnabled: true,
             selectable: true,
             layout: {name: 'preset'},
             style: cytoscape.stylesheet()
@@ -60,7 +60,8 @@ var scope;
                 .selector("node:selected")
                 .css({
                     "overlay-opacity": 0,
-                    "shape": "rectangle"
+                    "shape": "rectangle",
+                    "background-color": '#F7D4CB'
                 }),
             elements: {
                 nodes: [
@@ -118,8 +119,12 @@ var scope;
         var EDGE_TO_BE_INSERTED_STATE = false;
         var NODE_RESIZE_STATE = false;
         var NODES_DESELECTED_STATE = false;
+        var PANNING_STATE = false;
         var selectedItems = 0;
         cy.on('click', '', {}, function(evt) {
+            if(PANNING_STATE)
+                return;
+
             if(EDGE_TO_BE_INSERTED_STATE)
             {
                 if(isNode(evt.cyTarget))
@@ -213,6 +218,11 @@ var scope;
 
         var lastMousePosition = null;
         cy.on('mousemove ', '', {}, function(evt){
+            //when the left mouse button is not pressed the user is not dragging
+            if(evt.originalEvent.which == 0) {
+                PANNING_STATE = false;
+            }
+
             if(EDGE_TO_BE_INSERTED_STATE)
             {
                 var node = cy.$('#edgeNodeToBeInserted');
@@ -245,6 +255,9 @@ var scope;
         });
 
         cy.on('pan', '', {}, function() {
+            PANNING_STATE = true;
+            console.log("pan");
+            saveNodePositions();
             updateNodeTextStyle();
         });
 
@@ -262,11 +275,8 @@ var scope;
             {
                 var pos = nodes[i].position();
                 var renPos = nodes[i].renderedPosition();
-                console.log(pos);
-                console.log(renPos);
                 var w = nodes[i].width();
                 var h = nodes[i].height();
-                console.log(cy.zoom());
                 nodePositions.push({
                     id: nodes[i].id(),
                     position: {x: pos.x, y: pos.y},
@@ -307,7 +317,6 @@ var scope;
                 }
             }
             $scope.nodeTexts = nodeTexts;
-            console.log(nodeTexts);
             if ($scope.$root.$$phase != '$apply' && $scope.$root.$$phase != '$digest') {
                 $scope.$apply();
             }
@@ -329,17 +338,16 @@ var scope;
             /*
              * compute overlay
              */
+            var leftOverlayBoundary = node.renderedPosition().x - node.width() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var rightOverlayBoundary = node.renderedPosition().x + node.width() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
+            var topOverlayBoundary = node.renderedPosition().y - node.height() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
+            var bottomOverlayBoundary = node.renderedPosition().y + node.height() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
             $scope.makeSpaceOverlay = {
                 style: {
-                    'topLeft': { 'width': leftBoundary + cy.pan().x + 'px', height: topBoundary  + cy.pan().y + 'px', left: '0px', top: '0px' },
-                    'topRight': { 'width': cy.width() - cy.pan().x - rightBoundary + 'px', height: topBoundary + cy.pan().y + 'px',
-                        left: rightBoundary + cy.pan().x + 'px', top: '0px' },
-                    'bottomLeft': { 'width': leftBoundary + cy.pan().x + 'px', height: cy.height() - + cy.pan().y + bottomBoundary + 'px',
-                        left: '0px', top: bottomBoundary + cy.pan().y + 'px' },
-                    'bottomRight': { 'width': cy.width() - rightBoundary - cy.pan().x + 'px',
-                        height: cy.height() - cy.pan().y - bottomBoundary + 'px',
-                        left: rightBoundary + cy.pan().x + 'px',
-                        top: bottomBoundary + cy.pan().y + 'px' }
+                    'topLeft': { 'width': leftOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' },
+                    'topRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: '0px' },
+                    'bottomLeft': { 'width': leftOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' },
+                    'bottomRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: bottomOverlayBoundary + 'px' }
                 }
             };
 

@@ -9,31 +9,14 @@
     <script type="application/javascript" src="{% static 'main.js' %}"> </script> 
 
     <script type="application/javascript">
-        function testcb(data) {
-            alert(data);
-        };
 
-        function test() {
-            data = {
-                'nodes': [
-                    {'id': '1', 'x': 1, 'y': 1, 'height': 10, 'width': 10},
-                    {'id': '2', 'x': 22, 'y': 1, 'height': 10, 'width': 30},
-                    {'id': '3', 'x': 1, 'y': 12, 'height': 10, 'width': 50},
-                ], 
-                'adjacencies': [
-                    ['1', '2'], ['2', '3'], ['1', '3'],
-                ], 
-                'added_node': '3'
-            }
-
-            Dajaxice.solver.optimize(testcb, {'data': data});
-        }
     </script>
 </head>
 <style>
     html body {
         padding: 0;
         margin: 0;
+        overflow: hidden;
     }
     #cy {
         height: 100%;
@@ -44,6 +27,7 @@
         height: 100%;
         width: 100%;
         float: left;
+        overflow: hidden;
     }
 
     .sidebar {
@@ -54,9 +38,23 @@
 
     .nodeText{
         position: absolute;
-        background-color: blue;
-        pointer-events:none;
-        opacity: 0.5;
+        z-index: 10;
+        pointer-events: none;
+        color: black;
+        vertical-align: top;
+        overflow: hidden;
+    }
+
+    .nodeTextTitle {
+        font-weight: bold;
+        margin: 0px;
+        padding: 0px;
+        text-align: center;
+    }
+
+    .nodeTextDescription {
+        margin: 0px;
+        padding: 0px;
     }
 
     .invisibleNode{
@@ -74,23 +72,43 @@
         background-color: #ff734a;
     }
 
+    .makeSpaceOverlay {
+        position: absolute;
+        z-index: 11;
+        pointer-events: none;
+        background-color: black;
+        opacity: 0.1;
+    }
+
 </style>
 <body ng-app="GraphClientApp">
-<div ng-controller="MainController">
+<div ng-controller="MainController" style="overflow: hidden">
     <div id="mainDiv">
         <div id="cy"></div>
-        <div class="nodeText" ng-repeat="node in nodes" ng-style="node.style">
-            <p>{{ node.title }}</p>
-            <p>{{ node.description }}</p>
+        <div class="nodeText" ng-repeat="(nodeId, nodeText) in nodeTexts" ng-style="nodeText.style">
+            <p class="nodeTextTitle">[[ nodeText.title ]]</p>
+            <p class="nodeTextDescription">[[ nodeText.description ]]</p>
         </div>
-        <div class="sidebar" ng-show="singleNodeSelected">
-            <table cellspacing="0">
-                <tr><td>Title:</td><td><input type="text" value=""></td></tr>
-                <tr><td>Description:</td><td><textarea></textarea></td></tr>
+        <div class="sidebar">
+            <button ng-show="showComputeLayoutButton" ng-click="computeLayout()">ComputeLayout</button><br>
+            <button ng-show="showAlignButtons" ng-click="alignX()">Align X</button><br>
+            <button ng-show="showAlignButtons" ng-click="alignY()">Align Y</button><br>
+            <table cellspacing="0" ng-show="singleNodeSelected">
+                <form>
+                    <tr><td>Title:</td><td><input type="text" ng-model="singleNodeSelected.title"></td></tr>
+                    <tr><td>Description:</td><td><textarea ng-model="singleNodeSelected.description"></textarea></td></tr>
+                    <tr><td>Width:</td><td><input ng-model="singleNodeSelected.style.width" ng-change="setWidth()"></td></tr>
+                    <tr><td>Height:</td><td><input ng-model="singleNodeSelected.style.height" ng-change="setHeight()"></td></tr>
+                </form>
             </table>
         </div>
+        <div ng-hide="makeSpaceOverlay == null">
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.topLeft"></div>
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.topRight"></div>
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.bottomLeft"></div>
+            <div class="makeSpaceOverlay" ng-style="makeSpaceOverlay.style.bottomRight"></div>
+        </div>
     </div>
-    <button onclick="test();">Test!</button>
 </div>
 </body>
 </html>
