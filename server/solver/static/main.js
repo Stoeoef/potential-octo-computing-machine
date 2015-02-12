@@ -85,6 +85,38 @@ var scope;
             }
         });
 
+        $scope.computeLayout = function() {
+            $scope.showComputeLayoutButton = false;
+            //update adjacencies
+            var nodes = cy.elements('node');
+            for(var i = 0; i < nodes.length; ++i)
+            {
+                lastJSONExport.nodes[i]['x_post'] = nodes[i].position().x - nodes[i].width() / 2;
+                lastJSONExport.nodes[i]['y_post'] = nodes[i].position().y - nodes[i].height() / 2;
+            }
+
+            lastJSONExport.adjacencies = [];
+            var edges = cy.elements('edge');
+            for(var i = 0; i < edges.length; ++i)
+            {
+                var edge = edges[i];
+                lastJSONExport.adjacencies.push([
+                    edge.source().id(),
+                    edge.target().id()
+                ]);
+            }
+
+            lastJSONExport['xalign'] = [];
+            lastJSONExport['yalign'] = [];
+            lastJSONExport['max_swaps'] = 2;
+
+            console.log(JSON.stringify(lastJSONExport));
+            console.log(lastJSONExport);
+
+            computeLayout(lastJSONExport);
+        }
+
+
         $scope.setWidth = function() {
             var node = cy.elements('node:selected').first();
             node.css("width", nodeTexts[node.id()].style.width + "px");
@@ -126,6 +158,7 @@ var scope;
         var NODES_DESELECTED_STATE = false;
         var PANNING_STATE = false;
         var selectedItems = 0;
+        var lastJSONExport = {};
         cy.on('click', '', {}, function(evt) {
             if(PANNING_STATE)
                 return;
@@ -141,7 +174,6 @@ var scope;
 
                 cy.$('#edgeNodeToBeInserted').remove();
                 EDGE_TO_BE_INSERTED_STATE = false;
-                computeLayout();
                 return;
             }
 
@@ -177,13 +209,14 @@ var scope;
                         position: {x: evt.cyPosition.x, y: evt.cyPosition.y},
                         css: {'content': ''}
                     });
-                    //node.css('content', node.id());
+                    lastJSONExport = exportToJSON();
                     makeSpace(node);
                     NODE_RESIZE_STATE = true;
                 } else {
                     NODE_RESIZE_STATE = false;
                     lastMousePosition = null;
                     $scope.makeSpaceOverlay = null;
+                    $scope.showComputeLayoutButton = true;
                     saveNodePositions();
                 }
             }
@@ -270,6 +303,7 @@ var scope;
         function isNode(target) {
             return target.isNode != undefined && target.isNode();
         }
+
 
         var nodePositions = [];
         var nodeTexts = {};
@@ -431,10 +465,8 @@ var scope;
             }
         }
 
-        function computeLayout()
+        function computeLayout(json)
         {
-            console.log("computeLayout");
-            console.log(exportToJSON());
             function callback(data) {
                 var nodes = cy.elements('node');
                 for(var i = 0; i < nodes.length; ++i)
@@ -460,7 +492,7 @@ var scope;
             }
 */
 
-            Dajaxice.solver.optimize(callback, {'data': exportToJSON()});
+            Dajaxice.solver.optimize(callback, {'data': json});
         }
 
         function exportToJSON() {
@@ -475,8 +507,8 @@ var scope;
                 var node = nodes[i];
                 result.nodes.push({
                     'id': node.id(),
-                    'x': node.position().x,
-                    'y': node.position().y,
+                    'x': node.position().x - node.width() / 2,
+                    'y': node.position().y - node.height() / 2,
                     'height': node.height(),
                     'width': node.width()
                 });

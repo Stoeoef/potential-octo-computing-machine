@@ -89,8 +89,9 @@
             <p class="nodeTextTitle">[[ nodeText.title ]]</p>
             <p class="nodeTextDescription">[[ nodeText.description ]]</p>
         </div>
-        <div class="sidebar" ng-show="singleNodeSelected">
-            <table cellspacing="0">
+        <div class="sidebar">
+            <button ng-show="showComputeLayoutButton" ng-click="computeLayout()">ComputeLayout</button>
+            <table cellspacing="0" ng-show="singleNodeSelected">
                 <form>
                     <tr><td>Title:</td><td><input type="text" ng-model="singleNodeSelected.title"></td></tr>
                     <tr><td>Description:</td><td><textarea ng-model="singleNodeSelected.description"></textarea></td></tr>
