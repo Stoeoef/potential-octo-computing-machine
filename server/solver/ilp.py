@@ -6,7 +6,7 @@ Created on Feb 3, 2015
 import gurobipy as g
 from solver.models import DataSet
 
-from itertools import islice
+from itertools import islice, combinations
 
 def window(seq, n=2):
     "Returns a sliding window (of width n) over data from the iterable"
@@ -50,6 +50,8 @@ class ILPBuilder(object):
         last_v = y_sorted[0].v
         for v in y_sorted[1:].v:
             self.switch_y_vars[(last_v,v)] = self.ilp.addVar(vtype=g.GRB.BINARY, name='switch_y_%s_%s' % (last_v, v))
+            
+        self.ilp.update()
     
     def _compute_Ms(self):
         self.x_direction_m = (max((node.x for node in self.ds.nodes)) + self.ds.added_node.width) * 2
@@ -137,22 +139,26 @@ class ILPBuilder(object):
             
         return expr
     
+    def _make_overlapping_constraint(self, node1, node2):
+        n1x = self.xvars[node1.v]
+        n2x = self.xvars[node2.v]
+        n1y = self.yvars[node1.v]
+        n2y = self.yvars[node2.v]
+        
+        if node1.x > (node2.x + node2.width):
+            self.ilp.addConstr(n1x - n2x - node2.width, g.GRB.GREATER_EQUAL, 0, name="x_overlap_%s_%s" % (node2.v, node1.v))
+        elif node2.x > (node1.x + node1.width):
+            self.ilp.addConstr(n2x - n1x - node1.width, g.GRB.GREATER_EQUAL, 0, name="x_overlap_%s_%s" % (node1.v, node2.v))
+            
+        if (node1.y > (node2.y + node2.height)):
+            self.ilp.addConstr(n1y - n2y - node2.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node2.v, node1.v))
+        elif (node2.y > (node1.y + node1.height)):
+            self.ilp.addConstr(n2y - n1y - node1.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node1.v, node2.v))
+                
+                    
     def _make_initial_overlapping_constraints(self):
         for (node1, node2) in self.ds.adjacencies:
-            n1x = self.xvars[node1.v]
-            n2x = self.xvars[node2.v]
-            n1y = self.yvars[node1.v]
-            n2y = self.yvars[node2.v]
-            
-            if node1.x > (node2.x + node2.width):
-                self.ilp.addConstr(n1x - n2x - node2.width, g.GRB.GREATER_EQUAL, 0, name="x_overlap_%s_%s" % (node2.v, node1.v))
-            elif node2.x > (node1.x + node1.width):
-                self.ilp.addConstr(n2x - n1x - node1.width, g.GRB.GREATER_EQUAL, 0, name="x_overlap_%s_%s" % (node1.v, node2.v))
-                
-            if (node1.y > (node2.y + node2.height)):
-                self.ilp.addConstr(n1y - n2y - node2.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node2.v, node1.v))
-            elif (node2.y > (node1.y + node1.height)):
-                self.ilp.addConstr(n2y - n1y - node1.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node1.v, node2.v))
+            self._make_overlapping_constraint(node1, node2)
                 
     def _make_alignment_constraints(self):
         for xaligned in self.ds.xalignment:
@@ -186,8 +192,21 @@ class ILPBuilder(object):
             y = self.yvars[node.v].getAttr('x')
             positions[node.v] = (x,y)
         return positions
-            
+    
+    def _find_overlaps(self):
+        pos = self.solution()
+        overlaps = []
         
+        for (n1, n2) in combinations(self.ds.nodes, 2):
+            x_overlap = not ((pos[n2.v][0] > pos[n1.v][0] + n1.width) or (pos[n2.v][0] + n2.width < pos[n1.v][0]))
+            y_overlap = not ((pos[n2.v][1] > pos[n1.v][1] + n1.height) or (pos[n2.v][1] + n2.height < pos[n1.v][1]))
+            
+            if x_overlap and y_overlap:
+                overlaps.append((n1,n2))
+    def _mitigate_overlaps(self, overlaps):
+        for (n1, n2) in overlaps:
+             self._make_overlapping_constraint(n1, n2)
+             
     def _opt_callback(self, model, where):
         if (where != g.GRB.callback.MIPSOL) and (where != g.GRB.callback.MIPNODE):
             return
@@ -216,4 +235,12 @@ class ILPBuilder(object):
         self.ilp.setObjective(optexpr, g.GRB.MINIMIZE)
         
     def optimize(self):
-        self.ilp.optimize(lambda model, where : self._opt_callback(model, where))
+        self.ilp.optimize()
+        overlaps = self._find_overlaps()
+        while len(overlaps) > 0:
+            print('===================================================')
+            print('===> Found solution, but %s overlaps. Mitigating.' % (len(overlaps)))
+            print('===================================================')
+            self._mitigate_overlaps(overlaps)
+            self.ilp.optimize()
+            overlaps = self._find_overlaps()
