@@ -13,7 +13,7 @@ def optimize(request, data):
     nodes = []
     id_to_node = {}
     for node_data in data['nodes']:
-        node = Node(node_data['id'], node_data['x'], node_data['y'], node_data['post_x'], node_data['post_y'], node_data['width'], node_data['height'])
+        node = Node(node_data['id'], node_data['x'], node_data['y'], node_data['x_post'], node_data['y_post'], node_data['width'], node_data['height'])
         nodes.append(node)
         id_to_node[node.v] = node
      

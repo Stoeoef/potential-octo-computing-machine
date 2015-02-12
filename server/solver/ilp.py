@@ -32,7 +32,7 @@ class ILPBuilder(object):
         for (v1, v2) in self.switch_y_vars:
             expr.add(self.switch_y_vars[(v1,v2)], 1.0)
             
-        self.ilp.addConstr(expr, g.GRB.LOWER_EQUAL, self.allow_switches, name='switch_count')
+        self.ilp.addConstr(expr, g.GRB.LESS_EQUAL, self.allow_switches, name='switch_count')
                        
     def _make_switch_indicators(self):
         self.switch_x_vars = {}
@@ -43,12 +43,12 @@ class ILPBuilder(object):
         
         x_sorted = sorted(self.ds.nodes, key=lambda node : node.x)
         last_v = x_sorted[0].v
-        for v in x_sorted[1:].v:
+        for v in (n.v for n in x_sorted[1:]):
             self.switch_x_vars[(last_v,v)] = self.ilp.addVar(vtype=g.GRB.BINARY, name='switch_x_%s_%s' % (last_v, v))
             
         y_sorted = sorted(self.ds.nodes, key=lambda node : node.y)
         last_v = y_sorted[0].v
-        for v in y_sorted[1:].v:
+        for v in (n.v for n in y_sorted[1:]):
             self.switch_y_vars[(last_v,v)] = self.ilp.addVar(vtype=g.GRB.BINARY, name='switch_y_%s_%s' % (last_v, v))
             
         self.ilp.update()
@@ -203,6 +203,9 @@ class ILPBuilder(object):
             
             if x_overlap and y_overlap:
                 overlaps.append((n1,n2))
+                
+        return overlaps
+    
     def _mitigate_overlaps(self, overlaps):
         for (n1, n2) in overlaps:
              self._make_overlapping_constraint(n1, n2)
