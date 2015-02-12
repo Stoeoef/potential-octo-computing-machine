@@ -21,11 +21,24 @@ def optimize(request, data):
     for (id1, id2) in data['adjacencies']:
         adjacencies.append((id_to_node[id1], id_to_node[id2]))
 
+    xalign = []
+    for aligned in data['xalign']:
+        xalign.append([id_to_node[id] for id in aligned])
+    
+    yalign = []
+    for aligned in data['yalign']:
+        yalign.append([id_to_node[id] for id in aligned])    
+
     added = id_to_node[data['added_node']]
     
-    ds = DataSet(nodes, adjacencies, added)
+    ds = DataSet(nodes, adjacencies, added, xalign, yalign)
     
-    ilp = ILPBuilder(ds)
+    if 'max_swaps' in data:
+        max_swaps = data['max_swaps']
+    else:
+        max_swaps = 2
+        
+    ilp = ILPBuilder(ds, allow_switches=max_swaps)
     ilp.prepare()
     ilp.optimize()
     
