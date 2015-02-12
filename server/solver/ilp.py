@@ -6,26 +6,90 @@ Created on Feb 3, 2015
 import gurobipy as g
 from solver.models import DataSet
 
+from itertools import islice
+
+def window(seq, n=2):
+    "Returns a sliding window (of width n) over data from the iterable"
+    "   s -> (s0,s1,...s[n-1]), (s1,s2,...,sn), ...                   "
+    it = iter(seq)
+    result = tuple(islice(it, n))
+    if len(result) == n:
+        yield result    
+    for elem in it:
+        result = result[1:] + (elem,)
+        yield result
+        
 class ILPBuilder(object):
-    def __init__(self, dataset):
+    def __init__(self, dataset, allow_switches):
+        self.allow_switches = allow_switches
         self.ds = dataset
     
-    def _make_order_constraints(self):
+    def _make_switch_constraints(self):
+        expr = g.LinExpr()
+        for (v1, v2) in self.switch_x_vars:
+            expr.add(self.switch_x_vars[(v1,v2)], 1.0)
+            
+        for (v1, v2) in self.switch_y_vars:
+            expr.add(self.switch_y_vars[(v1,v2)], 1.0)
+            
+        self.ilp.addConstr(expr, g.GRB.LOWER_EQUAL, self.allow_switches, name='switch_count')
+                       
+    def _make_switch_indicators(self):
+        self.switch_x_vars = {}
+        self.switch_y_vars = {}
+        
+        if (self.allow_switches <= 0):
+            return 
+        
         x_sorted = sorted(self.ds.nodes, key=lambda node : node.x)
-        last_var = self.xvars[x_sorted[0].v]
-        for node in x_sorted[1:]:
-            var = self.xvars[node.v]
-            self.ilp.addConstr(var - last_var, g.GRB.GREATER_EQUAL, 0, name='x_order_%s' % (node.v,))
+        last_v = x_sorted[0].v
+        for v in x_sorted[1:].v:
+            self.switch_x_vars[(last_v,v)] = self.ilp.addVar(vtype=g.GRB.BINARY, name='switch_x_%s_%s' % (last_v, v))
+            
+        y_sorted = sorted(self.ds.nodes, key=lambda node : node.y)
+        last_v = y_sorted[0].v
+        for v in y_sorted[1:].v:
+            self.switch_y_vars[(last_v,v)] = self.ilp.addVar(vtype=g.GRB.BINARY, name='switch_y_%s_%s' % (last_v, v))
+    
+    def _compute_Ms(self):
+        self.x_direction_m = (max((node.x for node in self.ds.nodes)) + self.ds.added_node.width) * 2
+        self.y_direction_m = (max((node.y for node in self.ds.nodes)) + self.ds.added_node.height) * 2
+        
+    def _make_order_constraints(self):
+        x_sorted = sorted(self.ds.nodes, key=lambda node : node.x)       
+        for (n1, n2, n3) in window(x_sorted, n=3):
+            var1 = self.xvars[n1.v]
+            var2 = self.xvars[n2.v]
+            var3 = self.xvars[n3.v]
+            
+            direct_expr = g.LinExpr()
+            direct_expr.add(var3, 1)
+            direct_expr.add(var2, -1)
+            if ((n2.v, n3.v) in self.switch_x_vars):
+                direct_expr.add(self.switch_x_vars[(n2.v, n3.v)], self.x_direction_m)
+            
+            self.ilp.addConstr(direct_expr, g.GRB.GREATER_EQUAL, 0, name='x_order_1_%s' % (n3.v,))
+            self.ilp.addConstr(var3 - var1, g.GRB.GREATER_EQUAL, 0, name='x_order_2_%s' % (n3.v,))
         
         y_sorted = sorted(self.ds.nodes, key=lambda node : node.y)
-        last_var = self.yvars[y_sorted[0].v]
-        for node in y_sorted[1:]:
-            var = self.yvars[node.v]
-            self.ilp.addConstr(var - last_var, g.GRB.GREATER_EQUAL, 0, name='y_order_%s' % (node.v,))
+        for (n1, n2, n3) in window(y_sorted, n=3):
+            var1 = self.yvars[n1.v]
+            var2 = self.yvars[n2.v]
+            var3 = self.yvars[n3.v]
+            
+            direct_expr = g.LinExpr()
+            direct_expr.add(var3, 1)
+            direct_expr.add(var2, -1)
+            if ((n2.v, n3.v) in self.switch_y_vars):
+                direct_expr.add(self.switch_y_vars[(n2.v, n3.v)], self.y_direction_m)
+            
+            self.ilp.addConstr(direct_expr, g.GRB.GREATER_EQUAL, 0, name='y_order_1_%s' % (n3.v,))
+            self.ilp.addConstr(var3 - var1, g.GRB.GREATER_EQUAL, 0, name='y_order_2_%s' % (n3.v,))
             
             
     def _create_position_optimization(self):
         expr = g.LinExpr()
+        self.total_opt_distance = 0
         for (node1, node2) in self.ds.adjacencies:
             n1x = self.xvars[node1.v]
             n2x = self.xvars[node2.v]
@@ -34,6 +98,9 @@ class ILPBuilder(object):
             dx = node1.x - node2.x
             dy = node1.y - node2.y
             
+            self.total_opt_distance += dx
+            self.total_opt_distance += dy   
+                     
             xdistvar = self.ilp.addVar(vtype=g.GRB.CONTINUOUS)
             ydistvar = self.ilp.addVar(vtype=g.GRB.CONTINUOUS)
             self.ilp.update()
@@ -53,7 +120,18 @@ class ILPBuilder(object):
             expr.add(ydistvar, factor)
             
         return expr
+    
+    def _create_switch_optimization(self, expr):
+        factor = self.total_opt_distance * 0.05 # TODO configure
+        
+        for (v1, v2) in self.switch_x_vars:
+            expr.add(self.switch_x_vars[(v1,v2)], factor)
             
+        for (v1, v2) in self.switch_y_vars:
+            expr.add(self.switch_y_vars[(v1,v2)], factor)
+            
+        return expr
+    
     def _make_initial_overlapping_constraints(self):
         for (node1, node2) in self.ds.adjacencies:
             n1x = self.xvars[node1.v]
@@ -71,7 +149,19 @@ class ILPBuilder(object):
             elif (node2.y > (node1.y + node1.height)):
                 self.ilp.addConstr(n2y - n1y - node1.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node1.v, node2.v))
                 
+    def _make_alignment_constraints(self):
+        for xaligned in self.ds.xalignment:
+            reference = xaligned[0]
+            for alignee in xaligned[1:]:
+                diff = reference.x - alignee.x
+                self.ilp.addConstr(self.xvars[reference.v] - self.xvars[alignee.v], g.GRB.EQUAL, diff, name="x_align_%s_%s" % (reference.v, alignee.v))
                 
+        for yaligned in self.ds.yalignment:
+            reference = yaligned[0]
+            for alignee in yaligned[1:]:
+                diff = reference.y - alignee.y
+                self.ilp.addConstr(self.yvars[reference.v] - self.yvars[alignee.v], g.GRB.EQUAL, diff, name="y_align_%s_%s" % (reference.v, alignee.v))
+             
                 
     def _init_ilp(self):
         self.ilp = g.Model('ilp')
@@ -104,9 +194,20 @@ class ILPBuilder(object):
             
     def prepare(self):
         self._init_ilp()
+        self._make_switch_indicators()
+        self._compute_Ms()
+        
         self._make_initial_overlapping_constraints()
+        
+        self._make_switch_constraints()
         self._make_order_constraints()
+        
+        self._make_alignment_constraints()
+
+        
         optexpr = self._create_position_optimization()
+        optexpr = self._create_switch_optimization(optexpr)
+        
         self.ilp.setObjective(optexpr, g.GRB.MINIMIZE)
         
     def optimize(self):
