@@ -2,6 +2,7 @@
 <head>
     <script type="application/javascript" src="cytoscape.js"> </script>
     <script type="application/javascript" src="angular.js"> </script>
+    <script type="application/javascript" src="loadfile.js"> </script>
     <script type="application/javascript" src="main.js"> </script>
 </head>
 <style>
@@ -73,13 +74,14 @@
 <body ng-app="GraphClientApp">
 <div ng-controller="MainController">
     <div id="mainDiv">
-        <div id="cy"></div>
+        <div id="cy"></div>title
         <div class="nodeText" ng-repeat="(nodeId, nodeText) in nodeTexts" ng-style="nodeText.style">
             <p class="nodeTextTitle">{{ nodeText.title }}</p>
             <p class="nodeTextDescription">{{ nodeText.description }}</p>
         </div>
-        <div class="sidebar" ng-show="singleNodeSelected">
-            <table cellspacing="0">
+        <div class="sidebar">
+            <input type="file" id="loadFiles" />
+            <table cellspacing="0" ng-show="singleNodeSelected">
                 <form>
                     <tr><td>Title:</td><td><input type="text" ng-model="singleNodeSelected.title"></td></tr>
                     <tr><td>Description:</td><td><textarea ng-model="singleNodeSelected.description"></textarea></td></tr>
