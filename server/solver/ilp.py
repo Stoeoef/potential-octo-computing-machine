@@ -20,8 +20,9 @@ def window(seq, n=2):
         yield result
         
 class ILPBuilder(object):
-    def __init__(self, dataset, allow_switches):
-        self.allow_switches = allow_switches
+    def __init__(self, dataset, allow_switches, switch_badness):
+        self.allow_switches = allow_switches 
+        self.switch_badness = switch_badness
         self.ds = dataset
     
     def _make_switch_constraints(self):
@@ -54,8 +55,13 @@ class ILPBuilder(object):
         self.ilp.update()
     
     def _compute_Ms(self):
-        self.x_direction_m = (max((node.x for node in self.ds.nodes)) + self.ds.added_node.width) * 2
-        self.y_direction_m = (max((node.y for node in self.ds.nodes)) + self.ds.added_node.height) * 2
+        maxx = max((node.x for node in self.ds.nodes))
+        minx = min((node.x for node in self.ds.nodes))
+        self.x_direction_m = ((maxx - minx) + self.ds.added_node.width) * 3
+        
+        maxy = max((node.y for node in self.ds.nodes))
+        miny = min((node.y for node in self.ds.nodes))
+        self.y_direction_m = ((maxy - miny) + self.ds.added_node.height) * 3
         
     def _make_order_constraints(self):
         x_sorted = sorted(self.ds.nodes, key=lambda node : node.x)       
@@ -129,7 +135,7 @@ class ILPBuilder(object):
         return expr
     
     def _create_switch_optimization(self, expr):
-        factor = self.total_opt_distance * 0.05 # TODO configure
+        factor = self.total_opt_distance * self.switch_badness
         
         for (v1, v2) in self.switch_x_vars:
             expr.add(self.switch_x_vars[(v1,v2)], factor)
@@ -145,15 +151,28 @@ class ILPBuilder(object):
         n1y = self.yvars[node1.v]
         n2y = self.yvars[node2.v]
         
-        if node1.x > (node2.x + node2.width):
-            self.ilp.addConstr(n1x - n2x - node2.width, g.GRB.GREATER_EQUAL, 0, name="x_overlap_%s_%s" % (node2.v, node1.v))
-        elif node2.x > (node1.x + node1.width):
-            self.ilp.addConstr(n2x - n1x - node1.width, g.GRB.GREATER_EQUAL, 0, name="x_overlap_%s_%s" % (node1.v, node2.v))
-            
-        if (node1.y > (node2.y + node2.height)):
-            self.ilp.addConstr(n1y - n2y - node2.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node2.v, node1.v))
-        elif (node2.y > (node1.y + node1.height)):
-            self.ilp.addConstr(n2y - n1y - node1.height, g.GRB.GREATER_EQUAL, 0, name="y_overlap_%s_%s" % (node1.v, node2.v))
+        right = self.ilp.addVar(vtype=g.GRB.BINARY, name="%s_right_of_%s" % (node1.v, node2.v))
+        above = self.ilp.addVar(vtype=g.GRB.BINARY, name="%s_on_top_of_%s" % (node1.v, node2.v))
+        self.ilp.update()
+
+        right_constr = g.LinExpr()
+        right_constr.add(n1x, 1)
+        right_constr.add(n2x, -1)
+        right_constr.add(node2.width, -1)
+        right_constr.add(right, self.x_direction_m)
+        
+        left_constr = g.LinExpr()
+        left_constr.add(n1x, -1)
+        left_constr.add(n2x, 1)
+        left_constr.add(node1.width, -1)
+        left_constr.add(self.x_direction_m)
+        left_constr.add(right, -1 * self.x_direction_m)
+        
+        self.ilp.addConstr(right_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_right_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(left_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_left_%s_%s" % (node1.v, node2.v)) 
+
+        self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m), g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
                 
                     
     def _make_initial_overlapping_constraints(self):
@@ -233,11 +252,13 @@ class ILPBuilder(object):
 
         
         optexpr = self._create_position_optimization()
-        optexpr = self._create_switch_optimization(optexpr)
+        #optexpr = self._create_switch_optimization(optexpr)
         
         self.ilp.setObjective(optexpr, g.GRB.MINIMIZE)
         
     def optimize(self):
+        #self.ilp.update()
+        #self.ilp.write('/tmp/ilp.lp')
         self.ilp.optimize()
         overlaps = self._find_overlaps()
         while len(overlaps) > 0:
