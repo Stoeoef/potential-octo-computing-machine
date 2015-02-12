@@ -95,8 +95,13 @@ class ILPBuilder(object):
             n2x = self.xvars[node2.v]
             n1y = self.yvars[node1.v]
             n2y = self.yvars[node2.v]
-            dx = node1.x - node2.x
-            dy = node1.y - node2.y
+            
+            if node1.v == self.ds.added_node.v or node2.v == self.ds.added_node.v:
+                dx = node1.post_x - node2.post_x
+                dy = node1.post_y - node2.post_y
+            else:                        
+                dx = node1.x - node2.x
+                dy = node1.y - node2.y
             
             self.total_opt_distance += dx
             self.total_opt_distance += dy   
