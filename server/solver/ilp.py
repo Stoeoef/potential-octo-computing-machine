@@ -182,8 +182,29 @@ class ILPBuilder(object):
         self.ilp.addConstr(right_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_right_%s_%s" % (node2.v, node1.v))
         self.ilp.addConstr(left_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_left_%s_%s" % (node1.v, node2.v)) 
 
-        self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
-        self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m) + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
+        top_constr = g.LinExpr()
+        top_constr.add(n1y, 1)
+        top_constr.add(n2y, -1)
+        top_constr.add(node2.height, -1)
+        top_constr.add(above, self.y_direction_m)
+        
+        top_constr.add(xory, self.y_direction_m)
+        
+        bottom_constr = g.LinExpr()
+        bottom_constr.add(n1y, -1)
+        bottom_constr.add(n2y, 1)
+        bottom_constr.add(node1.height, -1)
+        bottom_constr.add(self.y_direction_m)
+        bottom_constr.add(above, -1 * self.y_direction_m)
+ 
+        bottom_constr.add(xory, self.y_direction_m)
+
+        self.ilp.addConstr(bottom_constr, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(top_constr, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
+        #self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
+        #self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m) + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
+        #self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
+        #self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m), g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
                 
                     
     def _make_initial_overlapping_constraints(self):
@@ -280,6 +301,8 @@ class ILPBuilder(object):
         while len(overlaps) > 0:
             print('===================================================')
             print('===> Found solution, but %s overlaps. Mitigating.' % (len(overlaps)))
+            for (n1, n2) in overlaps:
+                print('  => Overlapping: %s and %s' % (n1,n2))
             print('===================================================')
             self._mitigate_overlaps(overlaps)
             self.ilp.optimize()
