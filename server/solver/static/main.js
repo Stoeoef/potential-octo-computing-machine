@@ -106,6 +106,8 @@ var scope;
             }
         });
 
+        document.getElementById('loadFiles').addEventListener('change', loadFile, false);
+
         $scope.computeLayout = function() {
             $scope.showComputeLayoutButton = false;
             //update adjacencies
@@ -381,10 +383,18 @@ var scope;
                 {
                     //initial text
                     if(nodeTexts[nodes[i].id()] == undefined) {
-                        nodeTexts[nodes[i].id()] = {
-                            title: "Title",
-                            description: "Description"
-                        };
+                        if(nodes[i].data('title') && nodes[i].data('description'))
+                        {
+                            nodeTexts[nodes[i].id()] = {
+                                title: nodes[i].data('title'),
+                                description: nodes[i].data('description')
+                            };
+                        } else {
+                            nodeTexts[nodes[i].id()] = {
+                                title: "Title",
+                                description: "Description"
+                            };
+                        }
                     }
 
                     //update style and positioning on the screen
@@ -586,6 +596,144 @@ var scope;
                 ]);
             }
             return result;
+        }
+
+        function importJSON(json) {
+            console.log("import: ");
+            console.log(json);
+            for(var i = 0; i < json.nodes.length; ++i) {
+                var node = json.nodes[i];
+                cy.add({
+                    group: "nodes",
+                    data: {id: node.id, title: node.title, description: node.description},
+                    position: node.position,
+                    css: {width: node.width + 'px', height: node.height + 'px'}
+                });
+                saveNodePositions();
+            }
+
+            for(var i = 0; i < json.adjacencies.length; ++i) {
+                cy.add({
+                    group: "edges",
+                    data: {source: json.adjacencies[i][0], target: json.adjacencies[i][1]}
+                });
+            }
+        }
+
+        function getChildWithName(node, name) {
+            var x = node.firstChild;
+            while (x != null && (x.nodeType!=1 || x.localName != name)) {
+                x=x.nextSibling;
+            }
+            return x;
+        }
+
+        function getChildrenWithName(node, name) {
+            var result = [];
+            var x = node.firstChild;
+            while (x != null) {
+                if (x.nodeType == 1 && x.localName == name) {
+                    result.push(x);
+                }
+                x = x.nextSibling;
+            }
+            return result;
+        }
+
+        function loadFile(event) {
+            var file = event.target.files[0];
+            var parser = new DOMParser();
+            var reader = new FileReader();
+            var json = {
+                nodes: [],
+                adjacencies: []
+            };
+
+            reader.onload = function(xml) {
+
+                var xmlDocument = parser.parseFromString(reader.result, "text/xml");
+                var nodes = xmlDocument.getElementsByTagName("node");
+                for (var i = 0; i < nodes.length; i++) {
+                    var node = nodes[i];
+                    var d2;
+                    var d3;
+
+                    var children = getChildrenWithName(node, "data");
+                    for (var j = 0; j < children.length; j++) {
+                        var data = children[j];
+                        console.log(data);
+                        if (data.attributes.key.value == "d3") {
+                            d3 = data;
+                        } else if (data.attributes.key.value == "d2") {
+                            d2 = data;
+                        }
+                    }
+
+                    if (getChildWithName(d2, "group") != null) {
+                        // ignore group nodes
+                        console.log("ignore group");
+                        continue;
+                    }
+
+                    var shapeNode = getChildWithName(d3, "ShapeNode");
+                    var geomNode = getChildWithName(shapeNode, "Geometry");
+                    var height = round(geomNode.attributes.height.value);
+                    var width = round(geomNode.attributes.width.value);
+                    var x = round(geomNode.attributes.x.value);
+                    var y = round(geomNode.attributes.y.value);
+
+                    var thesis = getChildWithName(d2, "thesis");
+                    var argument = getChildWithName(d2, "argument");
+                    var title, description, titleNode, descriptionNode;
+                    title = "";
+                    description = "";
+
+                    if(thesis != null) {
+                        titleNode = getChildWithName(thesis, "title");
+                        descriptionNode = getChildWithName(thesis, "content");
+                    }
+
+                    if(argument != null) {
+                        titleNode = getChildWithName(argument, "title");
+                        descriptionNode = getChildWithName(argument, "description");
+                    }
+
+                    if(titleNode != null)
+                        title = titleNode.textContent;
+                    if(descriptionNode != null)
+                        description = descriptionNode.textContent;
+
+                    json.nodes.push({
+                        'id': node.attributes.id.value,
+                        'height': height,
+                        'width': width,
+                        'title': title,
+                        'description': description,
+                        'position': {
+                            x: x,
+                            y: y
+                        }
+                    });
+                }
+                var edges = xmlDocument.getElementsByTagName("edge");
+                for (var i = 0; i < edges.length; i++) {
+                    var edge = edges[i];
+                    if(edge.nodeName == "arg:edge")
+                        continue;
+                    json.adjacencies.push([
+                        edge.attributes.source.value,
+                        edge.attributes.target.value
+                    ]);
+                }
+
+                importJSON(json);
+            }
+            reader.readAsText(file);
+        }
+
+        function round(num)
+        {
+            return Math.round(num * 100) / 100;
         }
 
     }]);

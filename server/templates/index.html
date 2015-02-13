@@ -6,7 +6,7 @@
     {% dajaxice_js_import %}
     <script type="application/javascript" src="{% static 'cytoscape.js' %}"> </script>
     <script type="application/javascript" src="{% static 'angular.js' %}"> </script>
-    <script type="application/javascript" src="{% static 'main.js' %}"> </script> 
+    <script type="application/javascript" src="{% static 'main.js' %}"> </script>
 
     <script type="application/javascript">
 
@@ -90,6 +90,7 @@
             <p class="nodeTextDescription">[[ nodeText.description ]]</p>
         </div>
         <div class="sidebar">
+            File: <input type="file" id="loadFiles"><br>
             <button ng-show="showComputeLayoutButton" ng-click="computeLayout()">ComputeLayout</button><br>
             <button ng-show="showAlignButtons" ng-click="alignX()">Align X</button><br>
             <button ng-show="showAlignButtons" ng-click="alignY()">Align Y</button><br>
