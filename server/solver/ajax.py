@@ -47,7 +47,8 @@ def optimize(request, data):
     else:
         swap_badness = 0.05
         
-    ilp = ILPBuilder(ds, allow_switches=max_swaps, switch_badness=swap_badness)
+    ilp = ILPBuilder(ds, allow_switches=max_swaps, switch_badness=swap_badness,
+                     stretch_upper=1.5, stretch_badness=0.05)
     ilp.prepare()
     ilp.optimize()
     

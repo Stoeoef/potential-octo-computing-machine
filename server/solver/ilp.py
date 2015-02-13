@@ -20,10 +20,12 @@ def window(seq, n=2):
         yield result
         
 class ILPBuilder(object):
-    def __init__(self, dataset, allow_switches, switch_badness):
+    def __init__(self, dataset, allow_switches, switch_badness, stretch_upper, stretch_badness):
         self.allow_switches = allow_switches 
         self.switch_badness = switch_badness
         self.ds = dataset
+        self.stretch_upper = stretch_upper
+        self.stretch_badness = stretch_badness
     
     def _make_switch_constraints(self):
         expr = g.LinExpr()
@@ -118,11 +120,11 @@ class ILPBuilder(object):
             ydistvar = self.ilp.addVar(vtype=g.GRB.CONTINUOUS)
             self.ilp.update()
             
-            self.ilp.addConstr(xdistvar - (n1x - n2x - dx), g.GRB.GREATER_EQUAL, 0, "xdistvar_1_%s_%s" % (node1.v, node2.v))
-            self.ilp.addConstr(xdistvar - (-n1x + n2x + dx), g.GRB.GREATER_EQUAL, 0, "xdistvar_2_%s_%s" % (node1.v, node2.v))           
+            self.ilp.addConstr(xdistvar - (n1x - n2x - (dx * self.stretch_var)), g.GRB.GREATER_EQUAL, 0, "xdistvar_1_%s_%s" % (node1.v, node2.v))
+            self.ilp.addConstr(xdistvar - (-n1x + n2x + (dx * self.stretch_var)), g.GRB.GREATER_EQUAL, 0, "xdistvar_2_%s_%s" % (node1.v, node2.v))           
             
-            self.ilp.addConstr(ydistvar - (n1y - n2y - dy), g.GRB.GREATER_EQUAL, 0, "ydistvar_1_%s_%s" % (node1.v, node2.v))
-            self.ilp.addConstr(ydistvar - (-n1y + n2y + dy), g.GRB.GREATER_EQUAL, 0, "ydistvar_2_%s_%s" % (node1.v, node2.v))          
+            self.ilp.addConstr(ydistvar - (n1y - n2y - (dy * self.stretch_var)), g.GRB.GREATER_EQUAL, 0, "ydistvar_1_%s_%s" % (node1.v, node2.v))
+            self.ilp.addConstr(ydistvar - (-n1y + n2y + (dy * self.stretch_var)), g.GRB.GREATER_EQUAL, 0, "ydistvar_2_%s_%s" % (node1.v, node2.v))          
             
             if (self.ds.added_node == node1) or (self.ds.added_node == node2):
                 factor = len(self.ds.nodes) * 1.0
@@ -131,6 +133,8 @@ class ILPBuilder(object):
             
             expr.add(xdistvar, factor)
             expr.add(ydistvar, factor)
+            
+        expr.add(self.stretch_var, (self.stretch_badness * self.total_opt_distance))
             
         return expr
     
@@ -205,11 +209,16 @@ class ILPBuilder(object):
         self.xvars = {}
         self.yvars = {}
         
+        self.stretch_var = self.ilp.addVar(vtype=g.GRB.CONTINUOUS, name='stretchfactor')
+        
         for node in self.ds.nodes:
             self.xvars[node.v] = self.ilp.addVar(vtype=g.GRB.CONTINUOUS, name="x_%s" % (node.v,))
             self.yvars[node.v] = self.ilp.addVar(vtype=g.GRB.CONTINUOUS, name="y_%s" % (node.v,))
         
         self.ilp.update()
+        
+        self.ilp.addConstr(self.stretch_var, g.GRB.GREATER_EQUAL, 1.0, name='stretch_lower')
+        self.ilp.addConstr(self.stretch_var, g.GRB.LESS_EQUAL, self.stretch_upper, name='stretch_upper')
     
     def solution(self):
         positions = {}
