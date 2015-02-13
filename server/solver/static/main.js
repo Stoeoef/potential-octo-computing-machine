@@ -88,17 +88,18 @@ var scope;
         var MakeSpaceTechnique = {
             BOTH: 0,
             HORI: 1,
-            VERT: 2,
-            SMART: 3
+            VERT: 2
         }
         var currentMKTechnique = MakeSpaceTechnique.BOTH;
         $document.bind('keypress', function(e) {
             if(e.which == 120) // x pressed
             {
                 currentMKTechnique++;
-                currentMKTechnique %= 4;
+                currentMKTechnique %= 3;
                 if(NODE_RESIZE_STATE == true) {
+                    resetNodePositions();
                     makeSpace(cy.elements('node').last());
+                    saveNodePositions();
                     $scope.$apply();
                     console.log("make space with new technique: " + currentMKTechnique);
                 }
@@ -331,7 +332,6 @@ var scope;
             console.log("pan");
             PANNING_STATE = true;
             saveNodePositions();
-            updateNodeTextStyle();
         });
 
         function isNode(target) {
@@ -359,6 +359,18 @@ var scope;
                 });
             }
             updateNodeTextStyle();
+        }
+
+        function resetNodePositions() {
+            var nodes = cy.elements('node');
+            for(var i = 0; i < nodes.length; ++i)
+            {
+                var node = nodes[i];
+                node.position().x = lastJSONExport.nodes[i].x + lastJSONExport.nodes[i].width / 2;
+                node.position().y = lastJSONExport.nodes[i].y + lastJSONExport.nodes[i].height / 2;
+            }
+            cy.forceRender();
+            $scope.$apply();
         }
 
         function updateNodeTextStyle() {
@@ -437,12 +449,6 @@ var scope;
                     $scope.makeSpaceOverlay.style.bottomLeft = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
                     $scope.makeSpaceOverlay.style.bottomRight = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
                     break;
-                case MakeSpaceTechnique.SMART:
-                    $scope.makeSpaceOverlay.style.topLeft = { 'width': cy.width() + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' };
-                    $scope.makeSpaceOverlay.style.topRight = { 'width': leftOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: '0px', top: topOverlayBoundary + 'px' };
-                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': cy.width() + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' };
-                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: topOverlayBoundary + 'px' };
-                    break;
             };
 
 
@@ -495,25 +501,28 @@ var scope;
             }
 
 
-            for(var i = 0; i < nodes.length; ++i)
-            {
+            for(var i = 0; i < nodes.length; ++i) {
 
-                if(nodes[i].id == node.id())
+                if (nodes[i].id == node.id())
                     continue;
 
                 var curPos = nodes[i].position;
-                if(curPos.x < nodePosition.x) {
-                    cy.$("#" + nodes[i].id).position().x = nodes[i].position.x + translationLeft;
-                }
-                else {
-                    cy.$("#" + nodes[i].id).position().x = nodes[i].position.x + translationRight;
+                if (currentMKTechnique != MakeSpaceTechnique.HORI) {
+                    if (curPos.x < nodePosition.x) {
+                        cy.$("#" + nodes[i].id).position().x = nodes[i].position.x + translationLeft;
+                    }
+                    else {
+                        cy.$("#" + nodes[i].id).position().x = nodes[i].position.x + translationRight;
+                    }
                 }
 
-                if(curPos.y < nodePosition.y) {
-                    cy.$("#" + nodes[i].id).position().y = nodes[i].position.y + translationTop;
-                }
-                else {
-                    cy.$("#" + nodes[i].id).position().y = nodes[i].position.y + translationBottom;
+                if (currentMKTechnique != MakeSpaceTechnique.VERT) {
+                    if (curPos.y < nodePosition.y) {
+                        cy.$("#" + nodes[i].id).position().y = nodes[i].position.y + translationTop;
+                    }
+                    else {
+                        cy.$("#" + nodes[i].id).position().y = nodes[i].position.y + translationBottom;
+                    }
                 }
             }
         }
