@@ -4,7 +4,7 @@ var scope;
     app.config(function($interpolateProvider){
         $interpolateProvider.startSymbol('[[').endSymbol(']]');
     });
-    app.controller("MainController", ["$scope", "$http", function($scope, $http) {
+    app.controller("MainController", ["$scope", "$http", "$document", function($scope, $http, $document) {
         var ctx = null;
         var cy = cytoscape({
             container: document.getElementById('cy'),
@@ -82,6 +82,26 @@ var scope;
             },
             renderer: {
                 showFps: false
+            }
+        });
+
+        var MakeSpaceTechnique = {
+            BOTH: 0,
+            HORI: 1,
+            VERT: 2,
+            SMART: 3
+        }
+        var currentMKTechnique = MakeSpaceTechnique.BOTH;
+        $document.bind('keypress', function(e) {
+            if(e.which == 120) // x pressed
+            {
+                currentMKTechnique++;
+                currentMKTechnique %= 4;
+                if(NODE_RESIZE_STATE == true) {
+                    makeSpace(cy.elements('node').last());
+                    $scope.$apply();
+                    console.log("make space with new technique: " + currentMKTechnique);
+                }
             }
         });
 
@@ -397,15 +417,34 @@ var scope;
             var rightOverlayBoundary = node.renderedPosition().x + node.width() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
             var topOverlayBoundary = node.renderedPosition().y - node.height() * cy.zoom() / 2 - MINIMUM_SPACE_BETWEEN_NODES;
             var bottomOverlayBoundary = node.renderedPosition().y + node.height() * cy.zoom() / 2 + MINIMUM_SPACE_BETWEEN_NODES;
-            $scope.makeSpaceOverlay = {
-                style: {
-                    'topLeft': { 'width': leftOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' },
-                    'topRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: '0px' },
-                    'bottomLeft': { 'width': leftOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' },
-                    'bottomRight': { 'width': cy.width() - rightOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: bottomOverlayBoundary + 'px' }
-                }
+            $scope.makeSpaceOverlay = {style: {}};
+            switch(currentMKTechnique){
+                case MakeSpaceTechnique.BOTH:
+                    $scope.makeSpaceOverlay.style.topLeft = { 'width': leftOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.topRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': leftOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: bottomOverlayBoundary + 'px' };
+                    break;
+                case MakeSpaceTechnique.HORI:
+                    $scope.makeSpaceOverlay.style.topLeft = { 'width': cy.width() + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.topRight = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': cy.width() + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
+                    break;
+                case MakeSpaceTechnique.VERT:
+                    $scope.makeSpaceOverlay.style.topLeft = { 'width': leftOverlayBoundary + 'px', height: cy.height() + 'px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.topRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: cy.height() + 'px', left: rightOverlayBoundary + 'px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
+                    break;
+                case MakeSpaceTechnique.SMART:
+                    $scope.makeSpaceOverlay.style.topLeft = { 'width': cy.width() + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.topRight = { 'width': leftOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: '0px', top: topOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': cy.width() + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: topOverlayBoundary + 'px' };
+                    break;
             };
-            console.log(leftOverlayBoundary);
+
 
             var closestLeft, closestRight, closestBottom, closestTop;
             for(var i = 0; i < nodes.length; ++i)
