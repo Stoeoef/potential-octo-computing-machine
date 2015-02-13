@@ -10,6 +10,10 @@ from solver.ilp import ILPBuilder
 
 @dajaxice_register(method='GET')
 def optimize(request, data):
+    print("=================================")
+    print("Data I got:")
+    print(json.dumps(data, indent=2))
+    print("=================================")    
     nodes = []
     id_to_node = {}
     for node_data in data['nodes']:
@@ -46,5 +50,10 @@ def optimize(request, data):
     ilp = ILPBuilder(ds, allow_switches=max_swaps, switch_badness=swap_badness)
     ilp.prepare()
     ilp.optimize()
+    
+    print("=================================")
+    print("Data I sent:")
+    print(json.dumps(ilp.solution(), indent=2))
+    print("=================================") 
     
     return json.dumps(ilp.solution())

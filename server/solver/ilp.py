@@ -151,6 +151,7 @@ class ILPBuilder(object):
         n1y = self.yvars[node1.v]
         n2y = self.yvars[node2.v]
         
+        xory = self.ilp.addVar(vtype=g.GRB.BINARY, name='xory_%s_%s' % (node1.v, node2.v))
         right = self.ilp.addVar(vtype=g.GRB.BINARY, name="%s_right_of_%s" % (node1.v, node2.v))
         above = self.ilp.addVar(vtype=g.GRB.BINARY, name="%s_on_top_of_%s" % (node1.v, node2.v))
         self.ilp.update()
@@ -161,18 +162,24 @@ class ILPBuilder(object):
         right_constr.add(node2.width, -1)
         right_constr.add(right, self.x_direction_m)
         
+        right_constr.add(self.x_direction_m)
+        right_constr.add(xory, -1 * self.x_direction_m)
+        
         left_constr = g.LinExpr()
         left_constr.add(n1x, -1)
         left_constr.add(n2x, 1)
         left_constr.add(node1.width, -1)
         left_constr.add(self.x_direction_m)
         left_constr.add(right, -1 * self.x_direction_m)
-        
+ 
+        left_constr.add(self.x_direction_m)
+        left_constr.add(xory, -1 * self.x_direction_m)
+                
         self.ilp.addConstr(right_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_right_%s_%s" % (node2.v, node1.v))
         self.ilp.addConstr(left_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_left_%s_%s" % (node1.v, node2.v)) 
 
-        self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
-        self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m), g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
+        self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m) + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
                 
                     
     def _make_initial_overlapping_constraints(self):
@@ -257,8 +264,8 @@ class ILPBuilder(object):
         self.ilp.setObjective(optexpr, g.GRB.MINIMIZE)
         
     def optimize(self):
-        #self.ilp.update()
-        #self.ilp.write('/tmp/ilp.lp')
+        self.ilp.update()
+        self.ilp.write('/tmp/ilp.lp')
         self.ilp.optimize()
         overlaps = self._find_overlaps()
         while len(overlaps) > 0:
