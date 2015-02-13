@@ -7,6 +7,7 @@ import gurobipy as g
 from solver.models import DataSet
 
 from itertools import islice, combinations
+EPS=10
 
 def window(seq, n=2):
     "Returns a sliding window (of width n) over data from the iterable"
@@ -179,8 +180,8 @@ class ILPBuilder(object):
         left_constr.add(self.x_direction_m)
         left_constr.add(xory, -1 * self.x_direction_m)
                 
-        self.ilp.addConstr(right_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_right_%s_%s" % (node2.v, node1.v))
-        self.ilp.addConstr(left_constr, g.GRB.GREATER_EQUAL, 0, name="x_overlap_left_%s_%s" % (node1.v, node2.v)) 
+        self.ilp.addConstr(right_constr - EPS, g.GRB.GREATER_EQUAL, 0, name="x_overlap_right_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(left_constr - EPS, g.GRB.GREATER_EQUAL, 0, name="x_overlap_left_%s_%s" % (node1.v, node2.v)) 
 
         top_constr = g.LinExpr()
         top_constr.add(n1y, 1)
@@ -199,8 +200,8 @@ class ILPBuilder(object):
  
         bottom_constr.add(xory, self.y_direction_m)
 
-        self.ilp.addConstr(bottom_constr, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node2.v, node1.v))
-        self.ilp.addConstr(top_constr, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(bottom_constr - EPS, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node2.v, node1.v))
+        self.ilp.addConstr(top_constr - EPS, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
         #self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
         #self.ilp.addConstr(n2y - n1y - node1.height + self.y_direction_m - (above * self.y_direction_m) + self.y_direction_m * xory, g.GRB.GREATER_EQUAL, 0, name="y_overlap_below_%s_%s" % (node1.v, node2.v))
         #self.ilp.addConstr(n1y - n2y - node2.height + self.y_direction_m * above, g.GRB.GREATER_EQUAL, 0, name="y_overlap_above_%s_%s" % (node2.v, node1.v))
@@ -208,7 +209,8 @@ class ILPBuilder(object):
                 
                     
     def _make_initial_overlapping_constraints(self):
-        for (node1, node2) in self.ds.adjacencies:
+        #for (node1, node2) in self.ds.adjacencies:
+        for (node1, node2) in combinations(self.ds.nodes, 2):
             self._make_overlapping_constraint(node1, node2)
                 
     def _make_alignment_constraints(self):
