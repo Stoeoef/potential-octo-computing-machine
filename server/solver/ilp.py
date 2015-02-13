@@ -273,8 +273,8 @@ class ILPBuilder(object):
         self.ilp.setObjective(optexpr, g.GRB.MINIMIZE)
         
     def optimize(self):
-        self.ilp.update()
-        self.ilp.write('/tmp/ilp.lp')
+        #self.ilp.update()
+        #self.ilp.write('/tmp/ilp.lp')
         self.ilp.optimize()
         overlaps = self._find_overlaps()
         while len(overlaps) > 0:
