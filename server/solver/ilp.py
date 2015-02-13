@@ -209,8 +209,8 @@ class ILPBuilder(object):
                 
                     
     def _make_initial_overlapping_constraints(self):
-        #for (node1, node2) in self.ds.adjacencies:
-        for (node1, node2) in combinations(self.ds.nodes, 2):
+        for (node1, node2) in self.ds.adjacencies:
+        #for (node1, node2) in combinations(self.ds.nodes, 2):
             self._make_overlapping_constraint(node1, node2)
                 
     def _make_alignment_constraints(self):
@@ -291,12 +291,16 @@ class ILPBuilder(object):
 
         
         optexpr = self._create_position_optimization()
-        #optexpr = self._create_switch_optimization(optexpr)
+        optexpr = self._create_switch_optimization(optexpr)
         
         self.ilp.setObjective(optexpr, g.GRB.MINIMIZE)
         
     def optimize(self):
-        #self.ilp.update()
+        self.ilp.update()
+        print('--------------------------------')
+        self.ilp.printStats()        
+        print('--------------------------------')
+
         #self.ilp.write('/tmp/ilp.lp')
         self.ilp.optimize()
         overlaps = self._find_overlaps()
