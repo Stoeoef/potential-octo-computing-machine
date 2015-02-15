@@ -393,7 +393,7 @@ var scope;
                 var h = nodes[i].height();
                 nodePositions.push({
                     id: nodes[i].id(),
-                    position: {x: pos.x, y: pos.y},
+                    position: {x: pos.x, y: pos.y, smartX: pos.x, smartY: pos.y},
                     width: w,
                     height: h
                 });
@@ -506,6 +506,7 @@ var scope;
             };
 
 
+            var realNodes = cy.elements('node');
             var closestLeft, closestRight, closestBottom, closestTop;
             for(var i = 0; i < nodes.length; ++i)
             {
@@ -513,27 +514,72 @@ var scope;
                     continue;
                 }
 
-                var horizontalDistance = nodePosition.x - nodes[i].position.x;
-                var verticalDistance = nodePosition.y - nodes[i].position.y;
-                if(horizontalDistance >= 0 && (closestLeft == undefined || closestLeft.dist > horizontalDistance))
-                    closestLeft = {node: nodes[i], dist: horizontalDistance};
+                if(currentMKTechnique != MakeSpaceTechnique.SMART) {
 
-                if(horizontalDistance < 0 && (closestRight == undefined || closestRight.dist < horizontalDistance))
-                    closestRight = {node: nodes[i], dist: horizontalDistance};
+                    var horizontalDistance = nodePosition.x - nodes[i].position.x;
+                    var verticalDistance = nodePosition.y - nodes[i].position.y;
+                    if(horizontalDistance >= 0 && (closestLeft == undefined || closestLeft.dist > horizontalDistance))
+                        closestLeft = {node: nodes[i], dist: horizontalDistance};
+
+                    if(horizontalDistance < 0 && (closestRight == undefined || closestRight.dist < horizontalDistance))
+                        closestRight = {node: nodes[i], dist: horizontalDistance};
 
 
-                if(verticalDistance >= 0 && (closestTop == undefined || closestTop.dist > verticalDistance))
-                    closestTop = {node: nodes[i], dist: verticalDistance};
+                    if(verticalDistance >= 0 && (closestTop == undefined || closestTop.dist > verticalDistance))
+                        closestTop = {node: nodes[i], dist: verticalDistance};
 
-                if(verticalDistance < 0 && (closestBottom == undefined || closestBottom.dist < verticalDistance))
-                    closestBottom = {node: nodes[i], dist: verticalDistance};
+                    if(verticalDistance < 0 && (closestBottom == undefined || closestBottom.dist < verticalDistance))
+                        closestBottom = {node: nodes[i], dist: verticalDistance};
+
+                } else {
+                    var Dir = {
+                        LEFT: 0,
+                        RIGHT: 1,
+                        TOP: 2,
+                        BOTTOM: 3
+                    };
+                    var smartLeftDistance = leftBoundary - realNodes.position().x + nodes[i].width / 2;
+                    var smartRightDistance = realNodes[i].position().x - nodes[i].width / 2 - rightBoundary;
+                    if(!((realNodes[i].position().y - nodes[i].height / 2 < topBoundary &&
+                        realNodes[i].position().y + nodes[i].height / 2 < topBoundary) ||
+                        (realNodes[i].position().y - nodes[i].height / 2 > bottomBoundary &&
+                        realNodes[i].position().y + nodes[i].height / 2 > bottomBoundary))) {
+                        if(node.position().x >= nodes[i].position.x && (closestLeft == undefined || (smartLeftDistance < closestLeft.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.LEFT)))) {
+                            closestLeft = {node: nodes[i], dist: smartLeftDistance};
+                            nodes[i].dir = Dir.LEFT;
+                        }
+
+                        if(node.position().x <= nodes[i].position.x && (closestRight == undefined || (smartRightDistance < closestRight.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.RIGHT)))) {
+                            closestRight = {node: nodes[i], dist: smartRightDistance};
+                            nodes[i].dir = Dir.RIGHT;
+                        }
+                    }
+
+                    var smartTopDistance = topBoundary - realNodes[i].position().y + nodes[i].height / 2;
+                    var smartBottomDistance = realNodes[i].position().y - nodes[i].height / 2 - rightBoundary;
+                    if(!((realNodes[i].position().x - nodes[i].width / 2 < leftBoundary &&
+                        realNodes[i].position().x + nodes[i].width / 2 < leftBoundary) ||
+                        (realNodes[i].position().x - nodes[i].width / 2 > rightBoundary &&
+                        realNodes[i].position().x + nodes[i].width / 2 > rightBoundary))) {
+                        if(node.position().y > nodes[i].position.y && (closestTop == undefined || (smartTopDistance < closestTop.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.TOP)))) {
+                            closestTop = {node: nodes[i], dist: smartTopDistance};
+                            nodes[i].dir = Dir.TOP;
+                        }
+
+                        if(node.position().y < nodes[i].position.y && (closestBottom == undefined || (smartBottomDistance < closestBottom.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.BOTTOM)))) {
+                            closestBottom = {node: nodes[i], dist: smartBottomDistance};
+                            nodes[i].dir = Dir.BOTTOM;
+                        }
+                    }
+
+                }
             }
 
             var translationLeft = 0, translationRight = 0, translationTop = 0, translationBottom = 0;
             if(closestLeft) {
-                var closestNodeLeftBoundary = closestLeft.node.position.x + closestLeft.node.width / 2;
-                if (closestNodeLeftBoundary > leftBoundary)
-                    translationLeft = leftBoundary - closestNodeLeftBoundary;
+                    var closestNodeLeftBoundary = closestLeft.node.position.x + closestLeft.node.width / 2;
+                    if (closestNodeLeftBoundary > leftBoundary)
+                        translationLeft = leftBoundary - closestNodeLeftBoundary;
             }
 
             if(closestRight) {
@@ -555,7 +601,6 @@ var scope;
             }
 
             //SMART just translate if the closest node is in the immediate surrounding of the make space node
-
 
             for(var i = 0; i < nodes.length; ++i) {
 
