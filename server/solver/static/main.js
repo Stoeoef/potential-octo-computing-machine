@@ -101,7 +101,6 @@ var scope;
                     makeSpace(cy.elements('node').last());
                     saveNodePositions();
                     $scope.$apply();
-                    console.log("make space with new technique: " + currentMKTechnique);
                 }
             }
         });
@@ -137,11 +136,10 @@ var scope;
                 ]);
             }
 
-            lastJSONExport['xalign'] = [];
-            lastJSONExport['yalign'] = [];
+            lastJSONExport['xalign'] = horizontalAlign;
+            lastJSONExport['yalign'] = verticalAlign;
             lastJSONExport['max_swaps'] = 2;
 
-            console.log(JSON.stringify(lastJSONExport));
             console.log(lastJSONExport);
 
             computeLayout(lastJSONExport);
@@ -158,6 +156,46 @@ var scope;
             var node = cy.elements('node:selected').first();
             node.css("height", nodeTexts[node.id()].style.height + "px");
             updateNodeTextStyle();
+        }
+
+        var horizontalAlign = [];
+        $scope.alignX = function() {
+            var selectedNodes = cy.elements('node:selected');
+            var length = selectedNodes.length;
+            for(var i = 0; i < length; ++i) {
+                var sum = 0;
+                sum += selectedNodes[i].position().y;
+            }
+            var list = [];
+            var averageY = sum / length;
+            for(var i = 0; i < length; ++i)
+            {
+                selectedNodes[i].position().y = averageY;
+                list.push(selectedNodes[i].id());
+            }
+            horizontalAlign.push(list);
+            cy.forceRender();
+            saveNodePositions();
+        }
+
+        var verticalAlign = [];
+        $scope.alignY = function() {
+            var selectedNodes = cy.elements('node:selected');
+            var length = selectedNodes.length;
+            for(var i = 0; i < length; ++i) {
+                var sum = 0;
+                sum += selectedNodes[i].position().x;
+            }
+            var list = [];
+            var averageX = sum / length;
+            for(var i = 0; i < length; ++i)
+            {
+                selectedNodes[i].position().x = averageX;
+                list.push(selectedNodes[i].id());
+            }
+            verticalAlign.push(list);
+            cy.forceRender();
+            saveNodePositions();
         }
 
         /*
@@ -331,7 +369,6 @@ var scope;
         });
 
         cy.on('pan', '', {}, function() {
-            console.log("pan");
             PANNING_STATE = true;
             saveNodePositions();
         });
@@ -599,8 +636,6 @@ var scope;
         }
 
         function importJSON(json) {
-            console.log("import: ");
-            console.log(json);
             for(var i = 0; i < json.nodes.length; ++i) {
                 var node = json.nodes[i];
                 cy.add({
@@ -661,7 +696,6 @@ var scope;
                     var children = getChildrenWithName(node, "data");
                     for (var j = 0; j < children.length; j++) {
                         var data = children[j];
-                        console.log(data);
                         if (data.attributes.key.value == "d3") {
                             d3 = data;
                         } else if (data.attributes.key.value == "d2") {
@@ -671,7 +705,6 @@ var scope;
 
                     if (getChildWithName(d2, "group") != null) {
                         // ignore group nodes
-                        console.log("ignore group");
                         continue;
                     }
 
