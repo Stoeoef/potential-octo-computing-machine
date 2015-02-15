@@ -88,18 +88,19 @@ var scope;
         var MakeSpaceTechnique = {
             BOTH: 0,
             HORI: 1,
-            VERT: 2
+            VERT: 2,
+            SMART: 3
         }
         var currentMKTechnique = MakeSpaceTechnique.BOTH;
         $document.bind('keypress', function(e) {
             if(e.which == 120) // x pressed
             {
                 currentMKTechnique++;
-                currentMKTechnique %= 3;
+                currentMKTechnique %= 4;
                 if(NODE_RESIZE_STATE == true) {
                     resetNodePositions();
                     makeSpace(cy.elements('node').last());
-                    saveNodePositions();
+                    updateNodeTextStyle();
                     $scope.$apply();
                 }
             }
@@ -496,6 +497,12 @@ var scope;
                     $scope.makeSpaceOverlay.style.bottomLeft = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
                     $scope.makeSpaceOverlay.style.bottomRight = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
                     break;
+                case MakeSpaceTechnique.SMART:
+                    $scope.makeSpaceOverlay.style.topLeft = { 'width': cy.width() + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.topRight = { 'width': leftOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: '0px', top: topOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': cy.width() + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: topOverlayBoundary + 'px' };
+                    break;
             };
 
 
@@ -546,6 +553,8 @@ var scope;
                 if (closestNodeBottomBoundary < bottomBoundary)
                     translationBottom = bottomBoundary - closestNodeBottomBoundary;
             }
+
+            //SMART just translate if the closest node is in the immediate surrounding of the make space node
 
 
             for(var i = 0; i < nodes.length; ++i) {
