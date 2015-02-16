@@ -88,20 +88,20 @@ var scope;
         var MakeSpaceTechnique = {
             BOTH: 0,
             HORI: 1,
-            VERT: 2
+            VERT: 2,
+            SMART: 3
         }
         var currentMKTechnique = MakeSpaceTechnique.BOTH;
         $document.bind('keypress', function(e) {
             if(e.which == 120) // x pressed
             {
                 currentMKTechnique++;
-                currentMKTechnique %= 3;
+                currentMKTechnique %= 4;
                 if(NODE_RESIZE_STATE == true) {
                     resetNodePositions();
                     makeSpace(cy.elements('node').last());
-                    saveNodePositions();
+                    updateNodeTextStyle();
                     $scope.$apply();
-                    console.log("make space with new technique: " + currentMKTechnique);
                 }
             }
         });
@@ -137,11 +137,10 @@ var scope;
                 ]);
             }
 
-            lastJSONExport['xalign'] = [];
-            lastJSONExport['yalign'] = [];
+            lastJSONExport['xalign'] = horizontalAlign;
+            lastJSONExport['yalign'] = verticalAlign;
             lastJSONExport['max_swaps'] = 2;
 
-            console.log(JSON.stringify(lastJSONExport));
             console.log(lastJSONExport);
 
             computeLayout(lastJSONExport);
@@ -158,6 +157,46 @@ var scope;
             var node = cy.elements('node:selected').first();
             node.css("height", nodeTexts[node.id()].style.height + "px");
             updateNodeTextStyle();
+        }
+
+        var horizontalAlign = [];
+        $scope.alignX = function() {
+            var selectedNodes = cy.elements('node:selected');
+            var length = selectedNodes.length;
+            for(var i = 0; i < length; ++i) {
+                var sum = 0;
+                sum += selectedNodes[i].position().y;
+            }
+            var list = [];
+            var averageY = sum / length;
+            for(var i = 0; i < length; ++i)
+            {
+                selectedNodes[i].position().y = averageY;
+                list.push(selectedNodes[i].id());
+            }
+            horizontalAlign.push(list);
+            cy.forceRender();
+            saveNodePositions();
+        }
+
+        var verticalAlign = [];
+        $scope.alignY = function() {
+            var selectedNodes = cy.elements('node:selected');
+            var length = selectedNodes.length;
+            for(var i = 0; i < length; ++i) {
+                var sum = 0;
+                sum += selectedNodes[i].position().x;
+            }
+            var list = [];
+            var averageX = sum / length;
+            for(var i = 0; i < length; ++i)
+            {
+                selectedNodes[i].position().x = averageX;
+                list.push(selectedNodes[i].id());
+            }
+            verticalAlign.push(list);
+            cy.forceRender();
+            saveNodePositions();
         }
 
         /*
@@ -331,7 +370,6 @@ var scope;
         });
 
         cy.on('pan', '', {}, function() {
-            console.log("pan");
             PANNING_STATE = true;
             saveNodePositions();
         });
@@ -355,7 +393,7 @@ var scope;
                 var h = nodes[i].height();
                 nodePositions.push({
                     id: nodes[i].id(),
-                    position: {x: pos.x, y: pos.y},
+                    position: {x: pos.x, y: pos.y, smartX: pos.x, smartY: pos.y},
                     width: w,
                     height: h
                 });
@@ -459,9 +497,16 @@ var scope;
                     $scope.makeSpaceOverlay.style.bottomLeft = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
                     $scope.makeSpaceOverlay.style.bottomRight = { 'width': '0px', height: '0px', left: '0px', top: '0px' };
                     break;
+                case MakeSpaceTechnique.SMART:
+                    $scope.makeSpaceOverlay.style.topLeft = { 'width': cy.width() + 'px', height: topOverlayBoundary + 'px', left: '0px', top: '0px' };
+                    $scope.makeSpaceOverlay.style.topRight = { 'width': leftOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: '0px', top: topOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomLeft = { 'width': cy.width() + 'px', height: cy.height() - bottomOverlayBoundary + 'px', left: '0px', top: bottomOverlayBoundary + 'px' };
+                    $scope.makeSpaceOverlay.style.bottomRight = { 'width': cy.width() - rightOverlayBoundary + 'px', height: bottomOverlayBoundary - topOverlayBoundary + 'px', left: rightOverlayBoundary + 'px', top: topOverlayBoundary + 'px' };
+                    break;
             };
 
 
+            var realNodes = cy.elements('node');
             var closestLeft, closestRight, closestBottom, closestTop;
             for(var i = 0; i < nodes.length; ++i)
             {
@@ -469,27 +514,72 @@ var scope;
                     continue;
                 }
 
-                var horizontalDistance = nodePosition.x - nodes[i].position.x;
-                var verticalDistance = nodePosition.y - nodes[i].position.y;
-                if(horizontalDistance >= 0 && (closestLeft == undefined || closestLeft.dist > horizontalDistance))
-                    closestLeft = {node: nodes[i], dist: horizontalDistance};
+                if(currentMKTechnique != MakeSpaceTechnique.SMART) {
 
-                if(horizontalDistance < 0 && (closestRight == undefined || closestRight.dist < horizontalDistance))
-                    closestRight = {node: nodes[i], dist: horizontalDistance};
+                    var horizontalDistance = nodePosition.x - nodes[i].position.x;
+                    var verticalDistance = nodePosition.y - nodes[i].position.y;
+                    if(horizontalDistance >= 0 && (closestLeft == undefined || closestLeft.dist > horizontalDistance))
+                        closestLeft = {node: nodes[i], dist: horizontalDistance};
+
+                    if(horizontalDistance < 0 && (closestRight == undefined || closestRight.dist < horizontalDistance))
+                        closestRight = {node: nodes[i], dist: horizontalDistance};
 
 
-                if(verticalDistance >= 0 && (closestTop == undefined || closestTop.dist > verticalDistance))
-                    closestTop = {node: nodes[i], dist: verticalDistance};
+                    if(verticalDistance >= 0 && (closestTop == undefined || closestTop.dist > verticalDistance))
+                        closestTop = {node: nodes[i], dist: verticalDistance};
 
-                if(verticalDistance < 0 && (closestBottom == undefined || closestBottom.dist < verticalDistance))
-                    closestBottom = {node: nodes[i], dist: verticalDistance};
+                    if(verticalDistance < 0 && (closestBottom == undefined || closestBottom.dist < verticalDistance))
+                        closestBottom = {node: nodes[i], dist: verticalDistance};
+
+                } else {
+                    var Dir = {
+                        LEFT: 0,
+                        RIGHT: 1,
+                        TOP: 2,
+                        BOTTOM: 3
+                    };
+                    var smartLeftDistance = leftBoundary - realNodes.position().x + nodes[i].width / 2;
+                    var smartRightDistance = realNodes[i].position().x - nodes[i].width / 2 - rightBoundary;
+                    if(!((realNodes[i].position().y - nodes[i].height / 2 < topBoundary &&
+                        realNodes[i].position().y + nodes[i].height / 2 < topBoundary) ||
+                        (realNodes[i].position().y - nodes[i].height / 2 > bottomBoundary &&
+                        realNodes[i].position().y + nodes[i].height / 2 > bottomBoundary))) {
+                        if(node.position().x >= nodes[i].position.x && (closestLeft == undefined || (smartLeftDistance < closestLeft.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.LEFT)))) {
+                            closestLeft = {node: nodes[i], dist: smartLeftDistance};
+                            nodes[i].dir = Dir.LEFT;
+                        }
+
+                        if(node.position().x <= nodes[i].position.x && (closestRight == undefined || (smartRightDistance < closestRight.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.RIGHT)))) {
+                            closestRight = {node: nodes[i], dist: smartRightDistance};
+                            nodes[i].dir = Dir.RIGHT;
+                        }
+                    }
+
+                    var smartTopDistance = topBoundary - realNodes[i].position().y + nodes[i].height / 2;
+                    var smartBottomDistance = realNodes[i].position().y - nodes[i].height / 2 - rightBoundary;
+                    if(!((realNodes[i].position().x - nodes[i].width / 2 < leftBoundary &&
+                        realNodes[i].position().x + nodes[i].width / 2 < leftBoundary) ||
+                        (realNodes[i].position().x - nodes[i].width / 2 > rightBoundary &&
+                        realNodes[i].position().x + nodes[i].width / 2 > rightBoundary))) {
+                        if(node.position().y > nodes[i].position.y && (closestTop == undefined || (smartTopDistance < closestTop.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.TOP)))) {
+                            closestTop = {node: nodes[i], dist: smartTopDistance};
+                            nodes[i].dir = Dir.TOP;
+                        }
+
+                        if(node.position().y < nodes[i].position.y && (closestBottom == undefined || (smartBottomDistance < closestBottom.dist && (nodes[i].dir == undefined || nodes[i].dir == Dir.BOTTOM)))) {
+                            closestBottom = {node: nodes[i], dist: smartBottomDistance};
+                            nodes[i].dir = Dir.BOTTOM;
+                        }
+                    }
+
+                }
             }
 
             var translationLeft = 0, translationRight = 0, translationTop = 0, translationBottom = 0;
             if(closestLeft) {
-                var closestNodeLeftBoundary = closestLeft.node.position.x + closestLeft.node.width / 2;
-                if (closestNodeLeftBoundary > leftBoundary)
-                    translationLeft = leftBoundary - closestNodeLeftBoundary;
+                    var closestNodeLeftBoundary = closestLeft.node.position.x + closestLeft.node.width / 2;
+                    if (closestNodeLeftBoundary > leftBoundary)
+                        translationLeft = leftBoundary - closestNodeLeftBoundary;
             }
 
             if(closestRight) {
@@ -510,6 +600,7 @@ var scope;
                     translationBottom = bottomBoundary - closestNodeBottomBoundary;
             }
 
+            //SMART just translate if the closest node is in the immediate surrounding of the make space node
 
             for(var i = 0; i < nodes.length; ++i) {
 
@@ -599,8 +690,6 @@ var scope;
         }
 
         function importJSON(json) {
-            console.log("import: ");
-            console.log(json);
             for(var i = 0; i < json.nodes.length; ++i) {
                 var node = json.nodes[i];
                 cy.add({
@@ -661,7 +750,6 @@ var scope;
                     var children = getChildrenWithName(node, "data");
                     for (var j = 0; j < children.length; j++) {
                         var data = children[j];
-                        console.log(data);
                         if (data.attributes.key.value == "d3") {
                             d3 = data;
                         } else if (data.attributes.key.value == "d2") {
@@ -671,7 +759,6 @@ var scope;
 
                     if (getChildWithName(d2, "group") != null) {
                         // ignore group nodes
-                        console.log("ignore group");
                         continue;
                     }
 
