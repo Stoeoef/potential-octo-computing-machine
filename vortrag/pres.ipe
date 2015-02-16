@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70005" creator="Ipe 7.1.3">
-<info created="D:20090429144355" modified="D:20150213095021" title="Template for Ipe Presentations" author="My Name"/>
+<info created="D:20090429144355" modified="D:20150213230923" title="Template for Ipe Presentations" author="My Name"/>
 <preamble>\usepackage[utf8]{inputenc}
 \usepackage{amsmath,amssymb}
 \renewcommand{\vec}[1]{\mathaccent&quot;017E {#1}}
@@ -2310,313 +2310,6 @@ h
 <text layer="pagenumbers_format" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="31.6204" height="7.5578" depth="2.277" halign="center" valign="top" size="verytiny">{\bf [page]}</text>
 <text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="5.8604" height="7.5578" depth="0.184" halign="center" valign="top" size="verytiny">{\bf 0}</text>
 </page>
-<page title="Slide Title" section="">
-<layer name="alpha"/>
-<layer name="beta"/>
-<layer name="gamma"/>
-<layer name="delta"/>
-<layer name="pagenumbers_page" edit="no"/>
-<view layers="alpha pagenumbers_page" active="alpha"/>
-<view layers="alpha beta pagenumbers_page" active="beta"/>
-<view layers="alpha gamma pagenumbers_page" active="gamma"/>
-<view layers="alpha delta pagenumbers_page" active="delta"/>
-<group layer="beta">
-<path stroke="black" fill="KITblue15">
-0 104 m
-728 104 l
-8 0 0 -8 728 96 736 96 a
-736 37.5006 l
-8 37.5006 l
-8 0 0 -8 8 45.5006 0 45.5006 a
-h
-</path>
-</group>
-<text layer="alpha" pin="h" pos="0 440" stroke="black" type="minipage" width="736" height="141.135" depth="129.213" valign="top">Settings that can be changed in the document properties\\
-(Edit$\rightarrow$Document properties or press Ctrl+Shift+P):
-\begin{itemize}
-\item change the color of the item bullets:
-  \begin{itemize}
-  \item change definition of \textbackslash{itemcolor} (for example to
-    KITgreen)
-  \end{itemize}
-\item change name and title in the footer:
-  \begin{itemize}
-  \item change definition of commands \textbackslash{}name and
-    \textbackslash{}prestitle
-  \end{itemize}
-\item change the language:
-  \begin{itemize}
-  \item comment or uncomment the command \textbackslash{german}
-  \end{itemize}
-\end{itemize}</text>
-<group layer="gamma" matrix="1 0 0 1 0 32" pin="h">
-<path fill="KITblue">
-0 63.0802 m
-0 92 l
-726 92 l
-731 92 736 87 736 82 c
-736 63.0802 l
-h
-</path>
-<path fill="KITblue15">
-736 63.0802 m
-736 1.28581 l
-10 1.28581 l
-5 1.28581 0 6.28581 0 11.2858 c
-0 63.0802 l
-h
-</path>
-<text transformations="translations" pos="6.00005 85.9999" stroke="white" type="minipage" width="724" height="14.4133" depth="2.1805" valign="top">Theorem</text>
-<text transformations="translations" pos="6.00005 57.0801" stroke="black" type="minipage" width="724" height="31.5903" depth="19.404" valign="top">\textsc{FlexDraw} is NP-complete even for instances of size $n$ with
-      $O(n^\varepsilon)$ inflexible edges with pairwise distance
-      $\Omega(n^{1-\varepsilon})$.
-      </text>
-</group>
-<text layer="alpha" matrix="1 0 0 1 0 -282" pin="h" pos="0 440" stroke="black" type="minipage" width="736" height="16.7972" depth="4.557" valign="top">To modify the slide title, press Ctrl+P.</text>
-<text layer="gamma" matrix="1 0 0 1 507.228 -95.4874" transformations="translations" pos="224 112" stroke="black" type="label" width="315.187" height="13.112" depth="3.784" halign="right" valign="baseline" size="small">box created with the presentation ipelet</text>
-<text matrix="1 0 0 1 507.228 -116.643" transformations="translations" pos="224 112" stroke="black" type="label" width="436.482" height="10.81" depth="3.26" halign="right" valign="baseline" size="footnote">https://sourceforge.net/p/ipe7/wiki/Graph\_Ipelet/\#presentation-ipelet</text>
-<text layer="delta" matrix="1 0 0 1 -223.772 -60.4874" transformations="translations" pos="224 112" stroke="black" type="label" width="415.507" height="13.123" depth="4.026" valign="baseline" size="small">page numbers created with the Pagenumbers Ipelet</text>
-<text matrix="1 0 0 1 -223.772 -80.643" transformations="translations" pos="224 112" stroke="black" type="label" width="357.644" height="10.81" depth="3.26" valign="baseline" size="footnote">https://sourceforge.net/p/ipe7/wiki/Pagenumbers\_Ipelet/</text>
-<path stroke="black" pen="heavier" arrow="normal/normal">
--1.78204 49.5567 m
--18.5764 30.261
--12.8592 -27.6261 s
-</path>
-<text layer="beta" matrix="1 0 0 1 8 96" transformations="translations" pos="0 0" stroke="black" type="minipage" width="720" height="31.3404" depth="19.159" valign="top">To (semi-)automatically surround objects with simple KIT boxes use the
-decorator ipelet.  You can even define your own box types.
-</text>
-<text matrix="1 0 0 1 176.228 -94.643" transformations="translations" pos="224 112" stroke="black" type="label" width="331.32" height="10.81" depth="3.26" valign="baseline" size="footnote">https://sourceforge.net/p/ipe7/wiki/Decorator\_Ipelet/</text>
-<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="5.8604" height="7.5463" depth="0" halign="center" valign="top" size="verytiny">{\bf 1}</text>
-</page>
-<page title="Some Tests">
-<layer name="alpha"/>
-<layer name="pagenumbers_page" edit="no"/>
-<view layers="alpha pagenumbers_page" active="alpha"/>
-<group layer="alpha" matrix="1 0 0 1 -112 -160">
-<path stroke="black" fill="lightgray">
-400 416 m
-400 192 l
-528 192 l
-528 416 l
-h
-</path>
-<use matrix="1 0 0 1 32 -32" name="mark/disk(sx)" pos="416 400" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 32 -32" name="mark/disk(sx)" pos="448 400" size="small" stroke="black"/>
-<use matrix="1 0 0 1 -96 -32" name="mark/disk(sx)" pos="512 400" size="large" stroke="black"/>
-<use matrix="1 0 0 1 32 -32" name="mark/disk(sx)" pos="480 400" size="tiny" stroke="black"/>
-<use matrix="1 0 0 1 32 0" name="mark/circle(sx)" pos="416 400" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 32 0" name="mark/circle(sx)" pos="448 400" size="small" stroke="black"/>
-<use matrix="1 0 0 1 -96 0" name="mark/circle(sx)" pos="512 400" size="large" stroke="black"/>
-<use matrix="1 0 0 1 32 0" name="mark/circle(sx)" pos="480 400" size="tiny" stroke="black"/>
-<use matrix="1 0 0 1 32 -64" name="mark/fdisk(sfx)" pos="416 400" size="normal" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 32 -64" name="mark/fdisk(sfx)" pos="448 400" size="small" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 -96 -64" name="mark/fdisk(sfx)" pos="512 400" size="large" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 32 -64" name="mark/fdisk(sfx)" pos="480 400" size="tiny" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 32 -96" name="mark/box(sx)" pos="416 400" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 32 -96" name="mark/box(sx)" pos="448 400" size="small" stroke="black"/>
-<use matrix="1 0 0 1 -96 -96" name="mark/box(sx)" pos="512 400" size="large" stroke="black"/>
-<use matrix="1 0 0 1 32 -96" name="mark/box(sx)" pos="480 400" size="tiny" stroke="black"/>
-<use matrix="1 0 0 1 32 -128" name="mark/square(sx)" pos="416 400" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 32 -128" name="mark/square(sx)" pos="448 400" size="small" stroke="black"/>
-<use matrix="1 0 0 1 -96 -128" name="mark/square(sx)" pos="512 400" size="large" stroke="black"/>
-<use matrix="1 0 0 1 32 -128" name="mark/square(sx)" pos="480 400" size="tiny" stroke="black"/>
-<use matrix="1 0 0 1 32 -160" name="mark/fsquare(sfx)" pos="416 400" size="normal" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 32 -160" name="mark/fsquare(sfx)" pos="448 400" size="small" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 -96 -160" name="mark/fsquare(sfx)" pos="512 400" size="large" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 32 -160" name="mark/fsquare(sfx)" pos="480 400" size="tiny" stroke="black" fill="white"/>
-<use matrix="1 0 0 1 32 -192" name="mark/cross(sx)" pos="416 400" size="normal" stroke="black"/>
-<use matrix="1 0 0 1 32 -192" name="mark/cross(sx)" pos="448 400" size="small" stroke="black"/>
-<use matrix="1 0 0 1 -96 -192" name="mark/cross(sx)" pos="512 400" size="large" stroke="black"/>
-<use matrix="1 0 0 1 32 -192" name="mark/cross(sx)" pos="480 400" size="tiny" stroke="black"/>
-</group>
-<group matrix="1 0 0 1 32 -16">
-<text matrix="1 0 0 1 -208 -250.941" pos="213 427" stroke="black" type="label" width="105.347" height="13.1252" depth="0.286" valign="baseline" size="small">testtext small</text>
-<text matrix="1 0 0 1 -208 -160.105" pos="213 427" stroke="black" type="label" width="175.058" height="20.9704" depth="6.468" valign="baseline" size="Large">testtext Large</text>
-<text matrix="1 0 0 1 -208 -128.835" pos="213 427" stroke="black" type="label" width="239.096" height="25.6828" depth="0.572" valign="baseline" size="LARGE">testtext LARGE</text>
-<text matrix="1 0 0 1 -208 -84.1186" pos="213 427" stroke="black" type="label" width="238.207" height="30.2148" depth="9.306" valign="baseline" size="huge">testtext huge</text>
-<text matrix="1 0 0 1 -208 -33" pos="213 427" stroke="black" type="label" width="294.087" height="36.234" depth="11.176" valign="baseline" size="Huge">testtext Huge</text>
-<text matrix="1 0 0 1 -208 -227.721" pos="213 427" stroke="black" type="label" width="147.149" height="16.2264" depth="0.3675" valign="baseline">testtext normal</text>
-<text matrix="1 0 0 1 -208 -195.764" pos="213 427" stroke="black" type="label" width="153.461" height="19.4628" depth="6.0025" valign="baseline" size="large">testtext large</text>
-<text matrix="1 0 0 1 -208 -290.911" pos="213 427" stroke="black" type="label" width="64.3244" height="9.2736" depth="2.744" valign="baseline" size="tiny">testtext tiny</text>
-<text matrix="1 0 0 1 -208 -271.669" pos="213 427" stroke="black" type="label" width="103.474" height="10.714" depth="0.24" valign="baseline" size="footnote">testtext footnote</text>
-<text matrix="1 0 0 1 -208 -311" pos="213 427" stroke="black" type="label" width="72.8019" height="7.6176" depth="2.254" valign="baseline" size="verytiny">testtext verytiny</text>
-</group>
-<group matrix="1 0 0 1 80 64">
-<path matrix="1 0 0 1 -64 -80" stroke="black" fill="lightgray">
-352 416 m
-432 416 l
-</path>
-<path matrix="1 0 0 1 -64 -96" stroke="black" fill="lightgray" pen="heavier">
-352 416 m
-432 416 l
-</path>
-<path matrix="1 0 0 1 -64 -112" stroke="black" fill="lightgray" pen="fat">
-352 416 m
-432 416 l
-</path>
-<path matrix="1 0 0 1 -64 -128" stroke="black" fill="lightgray" pen="ultrafat">
-352 416 m
-432 416 l
-</path>
-</group>
-<group matrix="1 0 0 1 64 16">
-<path stroke="black" fill="lightgray" arrow="arc/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 0" stroke="black" fill="lightgray" arrow="arc/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 0" stroke="black" fill="lightgray" arrow="arc/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 0" stroke="black" fill="lightgray" arrow="arc/tiny">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 0 -32" stroke="black" fill="lightgray" arrow="farc/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 -32" stroke="black" fill="lightgray" arrow="farc/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 -32" stroke="black" fill="lightgray" arrow="farc/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 -32" stroke="black" fill="lightgray" arrow="farc/tiny">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 0 -64" stroke="black" fill="lightgray" arrow="pointed/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 -64" stroke="black" fill="lightgray" arrow="pointed/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 -64" stroke="black" fill="lightgray" arrow="pointed/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 -64" stroke="black" fill="lightgray" arrow="pointed/tiny">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 0 -96" stroke="black" fill="lightgray" arrow="fpointed/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 -96" stroke="black" fill="lightgray" arrow="fpointed/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 -96" stroke="black" fill="lightgray" arrow="fpointed/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 -96" stroke="black" fill="lightgray" arrow="fpointed/tiny">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 0 -128" stroke="black" fill="lightgray" arrow="linear/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 -128" stroke="black" fill="lightgray" arrow="linear/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 -128" stroke="black" fill="lightgray" arrow="linear/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 -128" stroke="black" fill="lightgray" arrow="linear/tiny">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 0 -192" stroke="black" fill="lightgray" arrow="fdouble/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 -192" stroke="black" fill="lightgray" arrow="fdouble/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 -192" stroke="black" fill="lightgray" arrow="fdouble/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 -192" stroke="black" fill="lightgray" arrow="fdouble/tiny">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 0 -160" stroke="black" fill="lightgray" arrow="double/large">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 48 -160" stroke="black" fill="lightgray" arrow="double/normal">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 96 -160" stroke="black" fill="lightgray" arrow="double/small">
-448 400 m
-480 400 l
-</path>
-<path matrix="1 0 0 1 144 -160" stroke="black" fill="lightgray" arrow="double/tiny">
-448 400 m
-480 400 l
-</path>
-</group>
-<group matrix="1 0 0 1 96 0">
-<path matrix="1 0 0 1 0 -80" stroke="black" dash="dense dashed" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -16" stroke="black" dash="long dashed" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -32" stroke="black" dash="long dash dotted" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -48" stroke="black" dash="dense dotted" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -64" stroke="black" dash="medium dotted" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -96" stroke="black" dash="dashed" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -112" stroke="black" dash="dotted" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -128" stroke="black" dash="dash dotted" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path matrix="1 0 0 1 0 -144" stroke="black" dash="dash dot dotted" pen="heavier">
-400 176 m
-496 176 l
-</path>
-<path stroke="black" pen="heavier">
-400 176 m
-496 176 l
-</path>
-</group>
-<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="5.8604" height="7.5463" depth="0" halign="center" valign="top" size="verytiny">{\bf 2}</text>
-</page>
 <page title="Übersicht">
 <layer name="alpha"/>
 <layer name="pagenumbers_page" edit="no"/>
@@ -2892,7 +2585,763 @@ h
 <page title="Seam Carving">
 <layer name="alpha"/>
 <layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<layer name="gamma"/>
+<layer name="delta"/>
+<layer name="epsilon"/>
+<layer name="zeta"/>
 <view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<view layers="alpha pagenumbers_page gamma" active="gamma"/>
+<view layers="alpha pagenumbers_page gamma delta" active="delta"/>
+<view layers="alpha pagenumbers_page gamma delta epsilon" active="epsilon"/>
+<view layers="alpha pagenumbers_page delta zeta" active="zeta"/>
+<group layer="alpha" matrix="1 0 0 1 0 218.115" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 77.8432 l
+83.6 77.8432 l
+78.6 77.8432 73.6 82.8432 73.6 87.8432 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="14.4133" depth="2.1805" valign="top">Die Idee</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="57.2835" depth="45.1535" valign="top">\begin{enumerate}
+\item Platz schaffen durch skalieren
+\item Knoten einfügen
+\item Überflüssigen Platz enfernen
+\end{enumerate}</text>
+</group>
+<path layer="beta" matrix="1 0 0 1 79 -49" stroke="black" fill="KITblue30">
+128 240 m
+128 192 l
+256 192 l
+256 240 l
+h
+</path>
+<path matrix="1 0 0 1 80 -48" stroke="black" fill="KITblue30">
+224 112 m
+224 176 l
+320 176 l
+320 112 l
+h
+</path>
+<path matrix="1 0 0 1 80 -48" stroke="black" fill="KITblue30">
+320 208 m
+320 272 l
+384 272 l
+384 208 l
+h
+</path>
+<path stroke="black">
+176 240 m
+176 240 l
+176 240 l
+176 240 l
+h
+</path>
+<path layer="gamma" matrix="0.855387 0 0 0.855387 73.5105 17.7071" stroke="black" fill="KITblue30">
+128 240 m
+128 192 l
+256 192 l
+256 240 l
+h
+</path>
+<path matrix="0.80685 0 0 0.80685 139.266 -58.3672" stroke="black" fill="KITblue30">
+224 112 m
+224 176 l
+320 176 l
+320 112 l
+h
+</path>
+<path matrix="0.782154 0 0 0.782154 187.653 43.2541" stroke="black" fill="KITblue30">
+320 208 m
+320 272 l
+384 272 l
+384 208 l
+h
+</path>
+<path stroke="black">
+176 240 m
+176 240 l
+176 240 l
+176 240 l
+h
+</path>
+<path layer="delta" matrix="1 0 0 1 -56 -8" stroke="black" fill="KITgreen30">
+336 112 m
+336 176 l
+424 176 l
+424 112 l
+h
+</path>
+<path layer="epsilon" matrix="1 0 0 1 -8 0" stroke="black" fill="KITred30">
+384 256 m
+384 184 l
+400 184 l
+400 168 l
+416 168 l
+416 104 l
+432 104 l
+432 32 l
+464 32 l
+464 128 l
+448 128 l
+448 184 l
+432 184 l
+432 200 l
+416 200 l
+416 256 l
+h
+</path>
+<path layer="zeta" matrix="0.855387 0 0 0.855387 73.5105 17.7071" stroke="black" fill="KITblue30">
+128 240 m
+128 192 l
+256 192 l
+256 240 l
+h
+</path>
+<path matrix="0.80685 0 0 0.80685 139.266 -58.3672" stroke="black" fill="KITblue30">
+224 112 m
+224 176 l
+320 176 l
+320 112 l
+h
+</path>
+<path matrix="0.782154 0 0 0.782154 155.653 43.2541" stroke="black" fill="KITblue30">
+320 208 m
+320 272 l
+384 272 l
+384 208 l
+h
+</path>
 <text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="5.8604" height="7.3577" depth="0" halign="center" valign="top" size="verytiny">{\bf 7}</text>
+</page>
+<page title="Die Implementierte Lösung">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<group layer="alpha" matrix="1 0 0 1 0 216" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 82.6378 l
+83.6 82.6378 l
+78.6 82.6378 73.6 87.6378 73.6 92.6378 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="16.8193" depth="4.5815" valign="top">Einfügen</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="54.8898" depth="42.7525" valign="top">\begin{itemize}
+\item Erhält relative Positionen
+\item Verhindert Überlappungen
+\item Skaliert nicht
+\end{itemize}</text>
+</group>
+<group layer="beta" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 116.296 l
+83.6 116.296 l
+78.6 116.296 73.6 121.296 73.6 126.296 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="14.4133" depth="2.1805" valign="top">&quot;Zurechtrücken&quot;</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="38.0632" depth="25.921" valign="top">\begin{itemize}
+\item minimiert Platzverschwendung
+\item flexible Anpassung an Wünsche
+\end{itemize}</text>
+</group>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="5.8604" height="7.5578" depth="0.184" halign="center" valign="top" size="verytiny">{\bf 8}</text>
+</page>
+<page title="Einfügen">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<layer name="gamma"/>
+<layer name="delta"/>
+<layer name="epsilon"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<view layers="pagenumbers_page beta gamma" active="gamma"/>
+<view layers="pagenumbers_page gamma delta" active="delta"/>
+<view layers="pagenumbers_page gamma delta epsilon" active="epsilon"/>
+<path layer="delta" fill="KITred30">
+32 248 m
+32 336 l
+720 336 l
+720 248 l
+h
+</path>
+<path fill="KITred30">
+344 16 m
+344 432 l
+472 432 l
+472 16 l
+h
+</path>
+<path layer="alpha" stroke="black" fill="KITblue30">
+88 384 m
+88 312 l
+192 312 l
+192 384 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+248 352 m
+248 296 l
+336 296 l
+336 352 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+160 288 m
+160 232 l
+272 232 l
+272 288 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+416 384 m
+416 320 l
+584 320 l
+584 384 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+440 256 m
+440 160 l
+584 160 l
+584 256 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+240 192 m
+240 112 l
+376 112 l
+376 192 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+328 200 m
+328 264 l
+384 264 l
+384 200 l
+h
+</path>
+<path stroke="black">
+136 312 m
+136 264 l
+160 264 l
+</path>
+<path stroke="black">
+192 336 m
+248 336 l
+</path>
+<path stroke="black">
+200 232 m
+200 152 l
+240 152 l
+</path>
+<path stroke="black">
+272 248 m
+328 248 l
+</path>
+<path stroke="black">
+384 232 m
+408 232 l
+408 208 l
+440 208 l
+</path>
+<path stroke="black">
+376 152 m
+480 152 l
+</path>
+<path stroke="black">
+480 160 m
+480 152 l
+</path>
+<path stroke="black">
+496 320 m
+496 256 l
+</path>
+<path stroke="black">
+192 368 m
+416 368 l
+</path>
+<use name="mark/cross(sx)" pos="400 304" size="19" stroke="black"/>
+<path layer="beta" stroke="KITred" pen="ultrafat">
+32 304 m
+696 304 l
+</path>
+<path stroke="KITred" pen="ultrafat">
+400 416 m
+400 56 l
+</path>
+<path layer="gamma" matrix="1 0 0 1 -40 40" stroke="black" fill="KITblue30">
+88 384 m
+88 312 l
+192 312 l
+192 384 l
+h
+</path>
+<path matrix="1 0 0 1 -40 40" stroke="black" fill="KITblue30">
+248 352 m
+248 296 l
+336 296 l
+336 352 l
+h
+</path>
+<path matrix="1 0 0 1 -40 -48" stroke="black" fill="KITblue30">
+160 288 m
+160 232 l
+272 232 l
+272 288 l
+h
+</path>
+<path matrix="1 0 0 1 64 40" stroke="black" fill="KITblue30">
+416 384 m
+416 320 l
+584 320 l
+584 384 l
+h
+</path>
+<path matrix="1 0 0 1 64 -48" stroke="black" fill="KITblue30">
+440 256 m
+440 160 l
+584 160 l
+584 256 l
+h
+</path>
+<path matrix="1 0 0 1 -40 -48" stroke="black" fill="KITblue30">
+240 192 m
+240 112 l
+376 112 l
+376 192 l
+h
+</path>
+<path matrix="1 0 0 1 -40 -48" stroke="black" fill="KITblue30">
+328 200 m
+328 264 l
+384 264 l
+384 200 l
+h
+</path>
+<path stroke="black">
+96 352 m
+96 224 l
+120 224 l
+</path>
+<path matrix="1 0 0 1 -40 40" stroke="black">
+192 336 m
+248 336 l
+</path>
+<path matrix="1 0 0 1 -40 -48" stroke="black">
+200 232 m
+200 152 l
+240 152 l
+</path>
+<path matrix="1 0 0 1 -40 -48" stroke="black">
+272 248 m
+328 248 l
+</path>
+<path stroke="black">
+344 184 m
+408 184 l
+408 160 l
+504 160 l
+</path>
+<path stroke="black">
+336 104 m
+544 104 l
+</path>
+<path matrix="1 0 0 1 64 -48" stroke="black">
+480 160 m
+480 152 l
+</path>
+<path stroke="black">
+560 360 m
+560 208 l
+</path>
+<path stroke="black">
+152 408 m
+480 408 l
+</path>
+<path layer="epsilon" stroke="KITred" fill="KITgreen30">
+352 256 m
+352 328 l
+464 328 l
+464 256 l
+h
+</path>
+<use layer="gamma" name="mark/cross(sx)" pos="400 304" size="19" stroke="black"/>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="5.8604" height="7.5578" depth="0.184" halign="center" valign="top" size="verytiny">{\bf 9}</text>
+</page>
+<page title="Das LP">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<group layer="alpha" matrix="1 0 0 1 0 176" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 115.97 l
+83.6 115.97 l
+78.6 115.97 73.6 120.97 73.6 125.97 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="14.4133" depth="2.1805" valign="top">Minimiert</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="38.242" depth="26.068" valign="top">\begin{itemize}
+\item den Skalierungsfaktor
+\item die Abweichung von den skalierten Wunschpositionen
+\end{itemize}</text>
+</group>
+<group layer="beta" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 112.222 l
+83.6 112.222 l
+78.6 112.222 73.6 117.222 73.6 122.222 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="14.4133" depth="2.1805" valign="top">Verhindert</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="40.1041" depth="27.9545" valign="top">\begin{itemize}
+\item (Knoten-)Überlappungen
+\item Vertauschungen von Knoten
+\end{itemize}</text>
+</group>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="11.7208" height="7.5578" depth="0.184" halign="center" valign="top" size="verytiny">{\bf 10}</text>
+</page>
+<page title="Das ILP">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<group layer="alpha" pin="h">
+<path fill="KITblue">
+73.6 367.08 m
+73.6 396 l
+652.4 396 l
+657.4 396 662.4 391 662.4 386 c
+662.4 367.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 367.08 m
+662.4 253.699 l
+83.6 253.699 l
+78.6 253.699 73.6 258.699 73.6 263.699 c
+73.6 367.08 l
+h
+</path>
+<text transformations="translations" pos="79.6001 390" stroke="white" type="minipage" width="576.8" height="14.4133" depth="2.1805" valign="top">Minimiert</text>
+<text transformations="translations" pos="79.6001 361.08" stroke="black" type="minipage" width="576.8" height="57.3545" depth="45.227" valign="top">\begin{itemize}
+\item den Skalierungsfaktor
+\item die Abweichung von den skalierten Wunschpositionen
+\item Die Anzahl der Vertauschungen
+\end{itemize}</text>
+</group>
+<group pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 150.493 l
+83.6 150.493 l
+78.6 150.493 73.6 155.493 73.6 160.493 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6001 214" stroke="white" type="minipage" width="576.8" height="14.4133" depth="2.1805" valign="top">Verhindert</text>
+<text transformations="translations" pos="79.6001 185.08" stroke="black" type="minipage" width="576.8" height="20.9916" depth="8.7955" valign="top">\begin{itemize}
+\item (Knoten-)Überlappungen
+\end{itemize}</text>
+</group>
+<path stroke="black" cap="1">
+499.303 89.4392 m
+499.303 89.4392 l
+</path>
+<text layer="beta" transformations="translations" pos="0 96" stroke="black" type="minipage" width="736" height="16.8903" depth="4.655" valign="top">Aber: Nur Vertauschungen in der Ordnung benachbarter Knoten!</text>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="11.7208" height="7.5463" depth="0" halign="center" valign="top" size="verytiny">{\bf 11}</text>
+</page>
+<page title="ILP - Statistiken">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<text layer="alpha" matrix="1 0 0 1 0 -112" transformations="translations" pos="0 432" stroke="black" type="minipage" width="736" height="66.0912" depth="53.998" valign="top" style="center">\begin{tabular} { l | c }
+Constraints &amp; 411 \\
+\hline
+Variablen &amp; 311 (258 Binär) \\
+\hline
+Größter Koeffizient &amp; 8141 \\
+\hline
+Laufzeit &amp; 0.05 s \\
+
+\end{tabular}
+</text>
+<text transformations="translations" pos="0 384" stroke="black" type="minipage" width="736" height="14.4133" depth="2.1805" valign="top">Instanz mit $15$ Knoten:</text>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="11.7208" height="7.5463" depth="0" halign="center" valign="top" size="verytiny">{\bf 12}</text>
+</page>
+<page title="Luft nach oben...">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<layer name="gamma"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<view layers="alpha pagenumbers_page beta gamma" active="gamma"/>
+<group layer="alpha" matrix="1 0 0 1 0 208" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 116.117 l
+83.6 116.117 l
+78.6 116.117 73.6 121.117 73.6 126.117 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="16.7114" depth="4.508" valign="top">Mehr Vertauschungen</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="38.1686" depth="25.9945" valign="top">\begin{itemize}
+\item Indikatorvariablen für beliebige Paare
+\item Transitivität erzwingen (Kubisch!)
+\end{itemize}</text>
+</group>
+<group layer="beta" matrix="1 0 0 1 0 80" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 121.113 l
+83.6 121.113 l
+78.6 121.113 73.6 126.113 73.6 131.113 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="16.7114" depth="4.508" valign="top">Beliebige Bedingungen</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="35.672" depth="23.4955" valign="top">\begin{itemize}
+\item Knoten aneinander fixieren
+\item 
+\end{itemize}</text>
+</group>
+<group layer="gamma" matrix="1 0 0 1 0 -48" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 159.048 l
+83.6 159.048 l
+78.6 159.048 73.6 164.048 73.6 169.048 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="16.5694" depth="4.3365" valign="top">Komplexere ILPs...</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="16.7237" depth="4.508" valign="top">könnten live ge-updatet werden.</text>
+</group>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="11.7208" height="7.5578" depth="0.184" halign="center" valign="top" size="verytiny">{\bf 13}</text>
+</page>
+<page title="Luft nach oben...">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<text layer="alpha" matrix="1 0 0 1 0 -16" transformations="translations" pos="0 432" stroke="black" type="minipage" width="736" height="18.8503" depth="6.615" valign="top" size="large" style="center">Kantenrouting!</text>
+<path stroke="black" fill="KITblue30">
+96 352 m
+96 272 l
+224 272 l
+224 352 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+352 304 m
+352 368 l
+448 368 l
+448 304 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+320 224 m
+320 160 l
+416 160 l
+416 224 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+512 272 m
+512 336 l
+576 336 l
+576 272 l
+h
+</path>
+<path stroke="black" fill="KITblue30">
+192 176 m
+192 240 l
+272 240 l
+272 176 l
+h
+</path>
+<path stroke="black">
+160 272 m
+160 256 l
+224 256 l
+224 240 l
+</path>
+<path stroke="black">
+224 304 m
+256 304 l
+256 336 l
+</path>
+<path stroke="black">
+256 336 m
+352 336 l
+</path>
+<path stroke="black">
+400 304 m
+400 256 l
+368 256 l
+368 224 l
+</path>
+<path stroke="black">
+256 240 m
+256 272 l
+320 272 l
+320 320 l
+</path>
+<path stroke="black">
+320 320 m
+352 320 l
+</path>
+<path stroke="black">
+512 320 m
+448 320 l
+</path>
+<path stroke="black">
+416 192 m
+544 192 l
+544 272 l
+</path>
+<use name="mark/cross(sx)" pos="256 304" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="256 336" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="320 320" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="320 272" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="256 272" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="224 256" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="160 256" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="368 256" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="400 256" size="normal" stroke="black"/>
+<use name="mark/cross(sx)" pos="544 192" size="normal" stroke="black"/>
+<text layer="beta" transformations="translations" pos="0 128" stroke="black" type="minipage" width="736" height="35.9195" depth="23.765" valign="top" style="itemize">\item Seitenvertauschungen?
+\item Neue Knicke?</text>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="11.7208" height="7.5463" depth="0" halign="center" valign="top" size="verytiny">{\bf 14}</text>
+</page>
+<page title="Live Demo!">
+<layer name="alpha"/>
+<layer name="pagenumbers_page" edit="no"/>
+<layer name="beta"/>
+<view layers="alpha pagenumbers_page" active="alpha"/>
+<view layers="alpha pagenumbers_page beta" active="beta"/>
+<text layer="alpha" matrix="1 0 0 1 0 -48" transformations="translations" pos="0 416" stroke="black" type="minipage" width="736" height="18.3568" depth="7.392" valign="top" size="LARGE" style="center">*Trommelwirbel*</text>
+<group layer="beta" matrix="1 0 0 1 0 80" pin="h">
+<path fill="KITblue">
+73.6 191.08 m
+73.6 220 l
+652.4 220 l
+657.4 220 662.4 215 662.4 210 c
+662.4 191.08 l
+h
+</path>
+<path fill="KITblue15">
+662.4 191.08 m
+662.4 5.96996 l
+83.6 5.96996 l
+78.6 5.96996 73.6 10.97 73.6 15.97 c
+73.6 191.08 l
+h
+</path>
+<text transformations="translations" pos="79.6 214" stroke="white" type="minipage" width="576.8" height="16.8193" depth="4.5815" valign="top">Ausbaufähig</text>
+<text transformations="translations" pos="79.6 185.08" stroke="black" type="minipage" width="576.8" height="93.1662" depth="81.144" valign="top">\begin{itemize}
+\item Positionierung des neuen Knoten ist schwierig
+\item Aber: Es wird &quot;zurechtgerückt&quot;
+\item Abwägung der Konstanten?
+
+\begin{itemize}
+\item Skalierung vs. Verschiebung
+\item Wie schlimm sind Vertauschungen?
+\end{itemize}
+\end{itemize}</text>
+</group>
+<text layer="pagenumbers_page" matrix="1 0 0 1 0.5 5.358" transformations="translations" pos="-13 -39" stroke="black" type="label" width="11.7208" height="7.5578" depth="0.184" halign="center" valign="top" size="verytiny">{\bf 15}</text>
 </page>
 </ipe>
