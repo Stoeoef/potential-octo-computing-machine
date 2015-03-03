@@ -1,0 +1,163 @@
+\documentclass{thesisclass}
+
+% Based on thesisclass.cls of Timo Rohrberg, 2009
+% ----------------------------------------------------------------
+% Thesis - Main document
+% ----------------------------------------------------------------
+\usepackage{wrapfig}
+
+
+%% -------------------------------
+%% |  Information for PDF file   |
+%% -------------------------------
+\hypersetup{
+ pdfauthor={?},
+ pdftitle={?},
+ pdfsubject={?},
+ pdfkeywords={?}
+}
+
+
+%% ---------------------------------
+%% | Information about the thesis  |
+%% ---------------------------------
+
+\newcommand{\myname}{Stefan Altmayer, Lukas Barth, Eric Braun, David Hopf, Frederike Neuber}
+\newcommand{\mytitle}{Visualisierung von Argumentkarten - Inkrementelle Layouts}
+\newcommand{\myinstitute}{Institute of Theoretical Computer Science}
+
+\newcommand{\reviewerone}{?}
+\newcommand{\reviewertwo}{?}
+\newcommand{\advisor}{Ignaz Rutter}
+\newcommand{\advisortwo}{Andreas Gemsa}
+
+\newcommand{\timestart}{1st October 2014}
+\newcommand{\timeend}{31th March 2015}
+
+
+\newcommand{\NP}{\ensuremath{\mathcal{NP}}}
+
+
+%% ---------------------------------
+%% | Commands                      |
+%% ---------------------------------
+
+\newtheorem{definition}{Definition} \numberwithin{definition}{chapter}
+\newtheorem{theorem}[definition]{Theorem}
+\newtheorem{lemma}[definition]{Lemma}
+\newtheorem{corollary}[definition]{Corollary}
+\newtheorem{conjecture}[definition]{Conjecture}
+
+
+%% --------------------------------
+%% | Settings for word separation |
+%% --------------------------------
+% Help for separation:
+% In german package the following hints are additionally available:
+% "- = Additional separation
+% "| = Suppress ligation and possible separation (e.g. Schaf"|fell)
+% "~ = Hyphenation without separation (e.g. bergauf und "~ab)
+% "= = Hyphenation with separation before and after
+% "" = Separation without a hyphenation (e.g. und/""oder)
+
+% Describe separation hints here:
+\hyphenation{
+% Pro-to-koll-in-stan-zen
+% Ma-na-ge-ment  Netz-werk-ele-men-ten
+% Netz-werk Netz-werk-re-ser-vie-rung
+% Netz-werk-adap-ter Fein-ju-stier-ung
+% Da-ten-strom-spe-zi-fi-ka-tion Pa-ket-rumpf
+% Kon-troll-in-stanz
+}
+
+
+%% ------------------------
+%% |    Including files   |
+%% ------------------------
+% Only files listed here will be included!
+% Userful command for partially translating the document (for bug-fixing e.g.)
+\includeonly{
+titlepage,
+%introduction,
+%preliminaries,
+content,
+conclusion,
+appendix
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Here, main documents begins %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+% Remove the following line for German text
+%\selectlanguage{english}
+
+\frontmatter
+\pagenumbering{roman}
+\include{titlepage}
+
+
+%% -------------------
+%% |   Abstract      |
+%% -------------------
+
+% \thispagestyle{plain}
+%
+% \begin{addmargin}{0.5cm}
+%
+% \centerline{\bf Abstract}
+%
+% A short summary of what is going on here.
+%
+% \vskip 2cm
+%
+% \centerline{\bf Deutsche Zusammenfassung}
+%
+% Kurze Inhaltsangabe auf deutsch.
+%
+% \end{addmargin}
+
+%% -------------------
+%% |   Directories   |
+%% -------------------
+
+\tableofcontents
+
+%% -----------------
+%% |   Main part   |
+%% -----------------
+
+\mainmatter
+\pagenumbering{arabic}
+%\include{introduction}
+%\include{preliminaries}
+\include{content}
+%\include{conclusion}
+
+
+%% --------------------
+%% |   Bibliography   |
+%% --------------------
+
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{chapter}{\bibname}
+
+\iflanguage{english}
+{\bibliographystyle{alpha}}
+{\bibliographystyle{babalpha-fl}} % german style
+
+\bibliography{references}
+
+
+%% ----------------
+%% |   Appendix   |
+%% ----------------
+
+\cleardoublepage
+\input{appendix}
+
+
+\end{document}
