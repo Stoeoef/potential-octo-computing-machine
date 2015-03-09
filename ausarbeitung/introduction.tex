@@ -1,15 +1,69 @@
 %% introduction.tex
 %%
+\label{sub:intro}
+
+In dieser Arbeit beschäftigen wir uns mit der Frage, wie Argumentkarten inkrementell gelayoutet werden können. Argumentkarten sind dabei abstrakt betrachtet gelayoutete Graphen, bei denen Knoten nicht punktförmig, sondern durch Rechtecke repräsentiert werden. Argumentkarten tragen darüber hinaus noch einiges an Semantik, so können beispielsweise Kanten entweder Unterstützung oder Angriffe von Argumenten untereinander darstellen, oder die Knoten sind beschriftet und sogar nummeriert. Für unsere Ansätze werden wir diese Semantik nicht benutzen.
+
+Das Problem des inkrementellen Layouts besteht darin, eine bereits existierende Argumentkarte zu verändern und für diese veränderte Argumentkarte ein neues Layout zu finden. Das neue Layout soll dabei in einer Weise gefunden werden, die die "`mentale Karte"' erhält, dass also ein menschlicher Betrachter, der die alte Karte kannte, sich in der neuen Karte schnell zurecht findet. Dies erreichen wir, indem wir die neue Karte so layouten, dass sie der alten, bekannten Karte ähnlich ist.
+
+Wir haben uns außerdem dafür entschieden, als Veränderungen der Karte ausschließlich das Hinzufügen eines einzelnen Knotens zu betrachten. Die Entfernung einer kleinen Anzahl von Knoten ist vermutlich gut durch einfaches Weglassen der Knoten umsetzbar, und daher algorithmisch nicht interessant. Die meisten anderen Operationen, wie zum Beispiel das Verschieben von Knoten, können dann als eine Aufeinanderfolge von Entfernungs- und Einfügeoperationen dargestellt werden.
+
+\subsection{Besondere Anforderungen}
+\label{sub:tasks}
+
+TODO Was wollten die Philosophen von uns?
 
 %% ==============================
-\chapter{Introduction}
-\label{ch:introduction}
+\subsection{Das Problem}
+\label{sub:problem}
 %% ==============================
 
-This chapter should contain
+Das Problem stellt sich aus Sicht eines Informatikers dar wie folgt. Gegeben sind:
+
 \begin{enumerate}
-  \item A short description of the thesis topic and its background.
-  \item An overview of related work in this field.
-  \item Contributions of the thesis.
-  \item Outline of the thesis.
+  \item ein Graph $G = (V, E)$
+  \item je ein Rechteck pro Knoten, oder genauer eine Funktion $b: V \rightarrow R^2$, die jedem Knoten seine Höhe und Breite zuordnet,
+  \item eine (überlappungsfreie) geometrische Einbettung von $G$, also eine Funktion $\omega: V \rightarrow R^2$, die jedem Knoten einen Punkt in der Ebene zuweist,
+  \item ein einzufügender neuer Knoten $a \in R^2$ mit einer Menge $M$ von Knoten, zu denen er adjazent ist
+  \item eine Funktion $\psi: M \rightarrow R^2$, die zu jedem Knoten $m \in M$ adjazent zu $a$ den Vektor zuordnet, der angibt, wie $a$ relativ zu $m$ platziert werden soll.
 \end{enumerate}
+
+Gesucht ist dann eine neue geometrische Einbettung $\omega'$ von $(V \cup \{a\}, E \cup \{(a,m) \mid m \in M\}$, die "`ähnlich"' ist zu $\omega$.
+
+\begin{paragraph}{Ähnlichkeit}
+  Bei der Definition der zu optimierenden Ähnlichkeit bieten sich mehrere Ansätze an: Zunächst die \textit{absolute Ähnlichkeit}, bei der schlicht die Summe der Entfernungen aller Positionen von ihren Ursprungspositionen minimiert wird, also
+  \begin{equation}
+    \min_{\omega'} \sum \limits_{v \in V} {|\omega(v) - \omega'(v)|}
+  \end{equation}
+
+  Diese Definition erschien uns jedoch zu starr. Insbesondere sind wir der Meinung, dass der Erhalt der "`mentalen Karte"' hauptsächlich davon abhängig ist, wie die Positionen der Knoten zueinander sind. Ein in unseren Augen besserer Ansatz könnte also lauten:
+  \begin{equation}
+    \min_{\omega'} \sum \limits_{(v,w) \in V \times V} {|(\omega(v) - \omega(w)) - (\omega'(v) - \omega'(w))|}
+  \end{equation}
+
+  Aber auch hier geht in die Optimierung noch die relative Position von zwei Knoten ein, die vielleicht an ganz unterschiedlichen Enden der Argumentkarte stehen, und bei denen eine Abweichung von der gewünschten relativen Position weniger stört als bei zwei Knoten, die dicht beieinander, und somit vermutlich auch in einem engeren semantischen Zusammenhang stehen. Dies könnte man nun über Gewichtungen versuchen zu lösen, wir haben uns aber entschieden, stattdessen nur die relativen Positionen von adjazenten Knoten zu betrachten:
+  \begin{equation}
+    \label{eqn:opt:basic}
+    \min_{\omega'} \sum \limits_{(v,w) \in E} {|(\omega(v) - \omega(w)) - (\omega'(v) - \omega'(w))|}
+  \end{equation}
+\end{paragraph}
+
+Zusätzlich muss noch die Position des neu einzufügenden Knotens berücksichtigt werden. Wäre nicht angegeben, wie der neue Knoten relativ zu seinen Nachbarn positioniert werden soll, so würde er vermutlich einfach außerhalb der bisher gelayouteten Argumentkarte platziert, da so der Term \ref{eqn:opt:basic} durch die alten Positionen optimiert wird, ohne dass eine Überlappung entstehen würde. Wir fügen also hinzu:
+
+\begin{equation}
+  \label{eqn:opt:new}
+  \min_{\omega'} \sum \limits_{m \in M} {|(\psi(m)) - (\omega'(a) - \omega'(m))|}
+\end{equation}
+
+\begin{paragraph}{Verschiebung versus Skalierung}
+  Wenn wir für einen Moment davon ausgehen, dass das neue Layout nicht überlappungsfrei sein muss, so werden (eine geeignete Wahl von $\psi$ vorausgesetzt) die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic} optimiert (zu Null) dadurch, dass alle alten Knoten auf ihren Plätzen bleiben und der neue Knoten am gewünschten Punkt (mit alten Knoten überlappend) eingefügt wird. Ausgehend von diesem Layout sehen wir zwei grundlegend verschiedene Möglichkeiten, den notwendigen Platz für ein überlappungsfreies Layout zu schaffen: Zunächst können natürlich einfach einzelne Knoten verschoben werden. Dies "`verzerrt"' die relativen Positionen von Knoten und erhöht die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic}. Andererseits ist es aber auch möglich, einfach alle Kantenlängen mit einem gewissen Faktor zu multiplizieren, was dadurch, dass das Layout insgesamt größer wird, äquivalent dazu ist, die Knotengrößen kleiner zu skalieren. Diese zweite Möglichkeit erhöht ebenfalls beide Summen, wir halten dies allerdings eigentlich für falsch: Für den Betrachter ändert sich nicht die relative Lage der Knoten zueinander, die Knoten werden nur kleiner. Wir führen daher einen Skalierungsfaktor $c$ ein. Natürlich muss $c$ so gewählt werden, dass er möglichst nah an $1$ gelegen ist. Insgesamt ergibt sich somit als Optimierungsfunktion:
+\end{paragraph}
+
+\begin{align}
+  \label{eqn:opt:complete}
+ \min_{\omega'} \quad & \alpha \sum \limits_{(v,w) \in E} {|c(\omega(v) - \omega(w)) - (\omega'(v) - \omega'(w))|} \nonumber \\
+  + & \beta \sum \limits_{m \in M} {|(c\psi(m)) - (\omega'(a) - \omega'(m))|} \nonumber \\
+  + & \gamma (|1 - c|)
+\end{align}
+
+Zeilen $1$ und $2$ entsprechen dabei den Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic} unter Berücksichtigung von $c$. Die Koeffizienten $\alpha, \beta$ und $\gamma$ dienen dazu, die einzelnen Teile der Optimierungsfunktion gegeneinander zu gewichten.

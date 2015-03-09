@@ -1,0 +1,24 @@
+Die in Abschnitt \ref{sub:problem} vorgestellte formale Definition des Problems versetzt uns in die Lage, vergleichsweise einfach ein Integer Linear Program anzugeben, das die gegebene Zielfunktion optimiert. Drei Variationen wollen wir im Folgenden vorstellen.
+
+Allgemein haben wir uns entschieden, Kanten in diesen Modellen nicht zu berücksichtigen. Wir gehen davon aus, dass es möglich ist, bei ähnlichen Knotenpositionierungen auch ein ähnliches Kantenrouting zu finden. Dies wird vermutlich insbesondere dann einfacher, wenn die Kanten auch ursprünglich algorithmisch (und nicht manuell) geroutet worden sind. Für eine erste Idee, wie das Kantenrouting behandelt werden könnte, siehe Abschnitt TODO.
+
+\subsection{Statische Reihenfolge}
+
+Wir haben uns entschieden, neben der in \ref{eqn:opt:complete} formulierten Optimierungsfunktion noch etwas schärfere Maßstäbe anzulegen, und die horizontale und vertikale Reihenfolge der Knoten jedenfalls annähernd zu fixieren. Dies ergibt sich vor allem auch aus den in Abschnitt \ref{sub:tasks} gestellten Anforderungen.
+
+Legt man sich fest, diese Reihenfolgen beim Finden eines neuen Layouts tatsächlich nicht zu verändern, und ist außerdem vorgegeben, an welcher Stelle der neue Knoten jeweils in die Reihenfolgen einzufügen ist, so lässt sich sogar ein Lineares Programm formulieren, das \ref{eqn:opt:complete} unter dieser Bedingung optimiert.\footnote{Andernfalls ist dies nicht möglich: Wenn es erlaubt ist, Knoten $A$ links oder rechts von $B$ zu platzieren, so ist die Bedingung zur Überlappungsfreiheit nicht ohne eine Integer-Variable zu formulieren.} Dieses LP hat nur eine Art von Nebenbedingungen, nämlich die, die für jedes Paar von (geometrisch) benachbarten Knoten die Überlappungsfreiheit sicherstellt. Dies ist eine starke Einschränkung: Prinzipiell ist es in einer gültigen Zeichnung erlaubt, dass zwei Knoten sich entweder horizontal oder vertikal überlappen, nicht jedoch beides. Im Linearen Programm muss nun festgelegt werden, in welcher Dimension zwei (benachbarte) Knoten sich nicht überlappen dürfen, eine Formulierung "`Entweder horizontal oder vertikal"' ist ohne Integer-Variablen nicht möglich. Ansonsten können die Terme aus \ref{eqn:opt:complete} direkt als Optimierungsfunktion übernommen werden.
+
+TODO doppel-halbordnung
+
+\subsection{Begrenzte Vertauschungen}
+
+Im nächsten Schritt wollen wir nun einige Vertauschungen in der Reihenfolge der Knoten zulassen, allerdings nur Vertauschungen von jeweils 2 in der Reihenfolge unmittelbar benachbarten Knoten. Außerdem werden wir die Einschränkung aufheben, dass im Voraus festgelegt sein muss, ob zwei Knoten horizontal oder vertikal überlappen dürfen. Hierzu führen wir zunächst boolsche Indikatorvariablen $I^{v}_{i,j}$ und $I^{h}_{i,j}$ ein, die angeben, ob die Knoten $i$ und $j$ jeweils in der horizontalen bzw. vertikalen Ordnung vertauscht wurden. Diese Variablen existieren nur für den Fall, dass $i$ und $j$ in der entsprechenden Ordnung benachbart sind. Außerdem fügen wir pro Knotenpaar drei weitere Indikatorvariablen ein: Zunächst die Variable $D_{i,j}$, die die Richtung (horizontal oder vertikal) angibt, in der die beiden Knoten sich nicht überlappen dürfen. Außerdem fügen wir sowohl für die horizontale als auch die vertikale Überlappung die Variablen $O^{v}_{i,j}$ bzw. $O^{h}_{i,j}$ ein, die angibt, ob $i$ entlang der entsprechenden Achse vor oder hinter $j$ liegt. Seien $X_i$ und $Y_i$ die $X$- bzw. $Y$-Koordinate der linken oberen Ecke von $i$, und $w$ und $h$ die Höhe und Breite von $i$. Die Überlappungsfreiheit lässt sich nun formulieren als:
+
+\begin{align}
+	X_i + w_i &< X_j &&+ M \cdot D_{i,j} &+ M \cdot O^{h}_{i,j} \label{eqn:overlap:h1}\\
+	X_i &> X_j + w_j &&+ M \cdot D_{i,j} &+ M - M \cdot O^{h}_{i,j} \label{eqn:overlap:h2}\\
+	Y_i + h_i &< Y_j &&+ M - M \cdot D_{i,j} &+ M \cdot O^{v}_{i,j} \label{eqn:overlap:v1}\\
+	Y_i &> Y_j + h_j &&+ M - M \cdot D_{i,j} &+ M - M \cdot O^{v}_{i,j} \label{eqn:overlap:v2}
+\end{align}
+
+Bei ausreichend groß gewähltem $M$ werden die Bedingungen \ref{eqn:overlap:h1} und \ref{eqn:overlap:h2} eingeschaltet, wenn eine horizontale Überlappung verboten werden soll, und \ref{eqn:overlap:v1} und \ref{eqn:overlap:v2} andernfalls. Innerhalb dieser Gruppen werden jeweils mittels $O^{h}_{i,j}$ bzw. $O^{v}_{i,j}$ eine Bedingung ein- und eine ausgeschaltet.
