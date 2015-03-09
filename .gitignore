@@ -4,3 +4,11 @@ gurobi.log
 *~
 .idea
 server/db.sqlite3
+
+
+*.out
+*.aux
+*.log
+*.toc
+ausarbeitung/ausarbeitung.pdf
+ausarbeitung/thesis.pdf
