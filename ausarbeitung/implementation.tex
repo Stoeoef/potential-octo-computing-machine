@@ -1,10 +1,12 @@
-\subsubsection{User Interface}
+Für dieses Seminar haben wir einen Prototypen, der die Implementierung eines der von uns vorgeschlagenen Integer Linear Programs mit einem Editor-Frontend vereint, entwickelt. Diesen möchten wir im Folgenden vorstellen.
 
-In diesem Kapitel wird die grafische Oberfläche, welche Teil des Prototypen ist, mit ihren
+\subsection{User Interface}
+
+In diesem Abschnitt wird die grafische Oberfläche, welche Teil des Prototypen ist, mit ihren
 Funktionalitäten vorgestellt. Außerdem wird die Bedeutung für einen eigenen Editor im
 Rahmen des Seminars erläutert.
 
-\paragraph{Beschreibung}
+\subsubsection{Beschreibung}
 
 Die GUI ist eine Webanwendung, welche mit Javascript programmiert wurde. Hierzu wurden
 die Javascript-Bibliotheken Cytoscape.js\cite{cytoscape} und Angular.js\cite{angularjs} benutzt. Cytoscape.js bietet bereits
@@ -60,9 +62,9 @@ und die Beschriftung der Knoten importiert. Falls man ein orthogonales Kantenrou
 implementiert hätte, könnte man hier auch noch die Position der Knicke auf den Kanten
 importieren, falls diese in der \textit{.graphml}-Datei vorhanden sind.
 
-\paragraph{Bedeutung für das Seminar}
+\subsubsection{Bedeutung für das Seminar}
 
-Die Anforderung der Philosophiestudenten, war, dass der Graph sich nur wenig ändern sollte,
+Die Anforderung der Philosophiestudenten war, dass der Graph sich nur wenig ändern sollte,
 wenn ein Knoten eingefügt wird. Die verschiedenen Modi dienen dazu, dass der Benutzer
 entscheiden kann, wieviel sich im Graphen ändert. Hier muss angemerkt werden, dass nur
 der erste Modus garantieren kann, dass sich orthogonale Kanten nicht überlappen würden.
@@ -83,3 +85,9 @@ vom Benutzer versucht der ILP-Algorithmus eine optimale (und somit in den meiste
 eine für den Benutzer wünschenswerte) Lösung zu finden.
  Die GUI bietet dem Benutzer Funktionen um schnell einen Graphen inkremetell aufzubauen
 und zugleich hat er die Freiheit selbst mit zu entscheiden, wie er den Graphen gestaltet.
+
+
+
+\subsection{Backend}
+
+Das Backend hat vor allem die Aufgabe, nach einer erfolgten Einfügung ein neues Layout zu berechnen, welches die zu Beginn dieser Arbeit vorgestellte Optimierungsfunktion \ref{eqn:opt:complete} in gewissem Rahmen optimiert. Hierfür haben wir das in Abschnitt \ref{sub:ilp:2} vorgestellte ILP mit einigen Anpassungen implementiert.
