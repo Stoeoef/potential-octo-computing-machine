@@ -2,11 +2,13 @@
 %%
 \label{sub:intro}
 
-In dieser Arbeit beschäftigen wir uns mit der Frage, wie Argumentkarten inkrementell gelayoutet werden können. Argumentkarten sind dabei abstrakt betrachtet gelayoutete Graphen, bei denen Knoten nicht punktförmig, sondern durch Rechtecke repräsentiert werden. Argumentkarten tragen darüber hinaus noch einiges an Semantik, so können beispielsweise Kanten entweder Unterstützung oder Angriffe von Argumenten untereinander darstellen, oder die Knoten sind beschriftet und sogar nummeriert. Für unsere Ansätze werden wir diese Semantik nicht benutzen.
+In dieser Arbeit beschäftigen wir uns mit der Frage, wie Argumentkarten inkrementell gelayoutet werden können. Argumentkarten sind dabei abstrakt betrachtet gelayoutete Graphen, bei denen Knoten nicht punktförmig, sondern durch Rechtecke repräsentiert werden. Argumentkarten tragen darüber hinaus noch einiges an Semantik, so können beispielsweise Kanten entweder Unterstützung oder Angriffe von Argumenten untereinander darstellen, außerdem sind die Knoten beschriftet und sogar nummeriert. Für unsere Ansätze werden wir diese Semantik nicht benutzen.
 
 Das Problem des inkrementellen Layouts besteht darin, eine bereits existierende Argumentkarte zu verändern und für diese veränderte Argumentkarte ein neues Layout zu finden. Das neue Layout soll dabei in einer Weise gefunden werden, die die "`mentale Karte"' erhält, dass also ein menschlicher Betrachter, der die alte Karte kannte, sich in der neuen Karte schnell zurecht findet. Dies erreichen wir, indem wir die neue Karte so layouten, dass sie der alten, bekannten Karte ähnlich ist.
 
 Wir haben uns außerdem dafür entschieden, als Veränderungen der Karte ausschließlich das Hinzufügen eines einzelnen Knotens zu betrachten. Die Entfernung einer kleinen Anzahl von Knoten ist vermutlich gut durch einfaches Weglassen der Knoten umsetzbar, und daher algorithmisch nicht interessant. Die meisten anderen Operationen, wie zum Beispiel das Verschieben von Knoten, können dann als eine Aufeinanderfolge von Entfernungs- und Einfügeoperationen dargestellt werden.
+
+TODO Übersicht über die Arbeit
 
 \subsection{Besondere Anforderungen}
 \label{sub:tasks}

@@ -1,6 +1,6 @@
 Die in Abschnitt \ref{sub:problem} vorgestellte formale Definition des Problems versetzt uns in die Lage, vergleichsweise einfach ein Integer Linear Program anzugeben, das die gegebene Zielfunktion optimiert. Drei Variationen wollen wir im Folgenden vorstellen.
 
-Allgemein haben wir uns entschieden, Kanten in diesen Modellen nicht zu berücksichtigen. Wir gehen davon aus, dass es möglich ist, bei ähnlichen Knotenpositionierungen auch ein ähnliches Kantenrouting zu finden. Dies wird vermutlich insbesondere dann einfacher, wenn die Kanten auch ursprünglich algorithmisch (und nicht manuell) geroutet worden sind. Für eine erste Idee, wie das Kantenrouting behandelt werden könnte, siehe Abschnitt TODO.
+Allgemein haben wir uns entschieden, Kanten in diesen Modellen nicht zu berücksichtigen. Wir gehen davon aus, dass es möglich ist, bei ähnlichen Knotenpositionierungen auch ein ähnliches Kantenrouting zu finden. Dies wird vermutlich insbesondere dann einfacher, wenn die Kanten auch ursprünglich algorithmisch (und nicht manuell) geroutet worden sind. Für eine erste Idee, wie das Kantenrouting behandelt werden könnte, siehe Abschnitt \ref{sub:edgeroute}.
 
 \subsection{Statische Reihenfolge}
 
@@ -11,14 +11,55 @@ Legt man sich fest, diese Reihenfolgen beim Finden eines neuen Layouts tatsächl
 TODO doppel-halbordnung
 
 \subsection{Begrenzte Vertauschungen}
+\label{sub:ilp:2}
 
 Im nächsten Schritt wollen wir nun einige Vertauschungen in der Reihenfolge der Knoten zulassen, allerdings nur Vertauschungen von jeweils 2 in der Reihenfolge unmittelbar benachbarten Knoten. Außerdem werden wir die Einschränkung aufheben, dass im Voraus festgelegt sein muss, ob zwei Knoten horizontal oder vertikal überlappen dürfen. Hierzu führen wir zunächst boolsche Indikatorvariablen $I^{v}_{i,j}$ und $I^{h}_{i,j}$ ein, die angeben, ob die Knoten $i$ und $j$ jeweils in der horizontalen bzw. vertikalen Ordnung vertauscht wurden. Diese Variablen existieren nur für den Fall, dass $i$ und $j$ in der entsprechenden Ordnung benachbart sind. Außerdem fügen wir pro Knotenpaar drei weitere Indikatorvariablen ein: Zunächst die Variable $D_{i,j}$, die die Richtung (horizontal oder vertikal) angibt, in der die beiden Knoten sich nicht überlappen dürfen. Außerdem fügen wir sowohl für die horizontale als auch die vertikale Überlappung die Variablen $O^{v}_{i,j}$ bzw. $O^{h}_{i,j}$ ein, die angibt, ob $i$ entlang der entsprechenden Achse vor oder hinter $j$ liegt. Seien $X_i$ und $Y_i$ die $X$- bzw. $Y$-Koordinate der linken oberen Ecke von $i$, und $w$ und $h$ die Höhe und Breite von $i$. Die Überlappungsfreiheit lässt sich nun formulieren als:
 
 \begin{align}
 	X_i + w_i &< X_j &&+ M \cdot D_{i,j} &+ M \cdot O^{h}_{i,j} \label{eqn:overlap:h1}\\
-	X_i &> X_j + w_j &&+ M \cdot D_{i,j} &+ M - M \cdot O^{h}_{i,j} \label{eqn:overlap:h2}\\
+	X_i &> X_j + w_j &&- M \cdot D_{i,j} &- M + M \cdot O^{h}_{i,j} \label{eqn:overlap:h2}\\
 	Y_i + h_i &< Y_j &&+ M - M \cdot D_{i,j} &+ M \cdot O^{v}_{i,j} \label{eqn:overlap:v1}\\
-	Y_i &> Y_j + h_j &&+ M - M \cdot D_{i,j} &+ M - M \cdot O^{v}_{i,j} \label{eqn:overlap:v2}
+	Y_i &> Y_j + h_j &&- M + M \cdot D_{i,j} &- M + M \cdot O^{v}_{i,j} \label{eqn:overlap:v2}
 \end{align}
 
 Bei ausreichend groß gewähltem $M$ werden die Bedingungen \ref{eqn:overlap:h1} und \ref{eqn:overlap:h2} eingeschaltet, wenn eine horizontale Überlappung verboten werden soll, und \ref{eqn:overlap:v1} und \ref{eqn:overlap:v2} andernfalls. Innerhalb dieser Gruppen werden jeweils mittels $O^{h}_{i,j}$ bzw. $O^{v}_{i,j}$ eine Bedingung ein- und eine ausgeschaltet.
+
+Aufgrund dieser allgemeineren Bedingungen für die Überlappungsfreiheit müssen wir nun den Erhalt der Reihenfolge gesondert sicherstellen, falls zwei Knoten nicht vertauscht werden sollen. Für jedes Paar von benachbarten Knoten $i$ und $j$ fügen wir also eine Bedingung hinzu. Für ein horizontal benachbartes Paar, bei dem $i$ vor $j$ liegt beispielsweise:
+
+\begin{align}
+	X_i < X_j + M \cdot I^{h}_{i,j}
+\end{align}
+
+Außerdem möchten wir die Anzahl der Vertauschungen nach wie vor minimieren, somit muss die Summe aller $I^{\{v,h\}}_{i,j}$ entsprechend gewichtet mit in die Optimierungsfunktion aufgenommen werden.
+
+Dieser Ansatz erzeugt mit den Bedingungen zur Überlappungsfreiheit eine quadratische Anzahl von Nebenbedingungen und Integer-Variablen. In der Praxis (siehe Abschnitt TODO) können diese aber im Normalfall drastisch reduziert werden.
+
+\subsection{Beliebige Vertauschungen}
+
+Der naheliegende Nächste Schritt ist es, beliebige Vertauschungen in der Reihenfolge zuzulassen. Nun werden also die Vertauschungsindikatoren $I^{\{v,h\}}_{i,j}$ für \textit{alle} Paare $i,j$ von Knoten erstellt, und nicht nur für in der Ordnung benachbarte Knoten. In diesem Szenario müssen wir allerdings Transitivität sicherstellen: Wenn in der ursprünglichen (horizontalen) Ordnung $i$ vor $j$ und $j$ vor $k$ war (also auch $i$ vor $k$), und $(i,j)$ und $(j,k)$ vertauscht worden sind, dann muss auch $(i,k)$ vertauscht worden sein! In den Nebenbedingungen schlägt sich das nieder wie folgt:
+
+\begin{align}
+	\forall (i,j,k) \in V^3 : \forall t \in \{v,h\} :  I^{t}_{i,j} + I^{t}_{j,k} - 2 I^{t}_{i,k} \leq 0 \label{eqn:transitivity}
+\end{align}
+
+In diesem Szenario wird nun nicht nur die Anzahl der boolschen $I^{\{v,h\}}$-Variablen quadratisch in der Anzahl der Knoten, sondern die Anzahl der Nebenbedingungen vom Typ \ref{eqn:transitivity} sogar kubisch in dieser. Wir halten es für fraglich, ob dieses System für realistische Größen noch in praktikabler Laufzeit lösbar ist.
+
+\subsection{Kantenrouting}
+\label{sub:edgeroute}
+
+Die bisher vorgestellten ILPs betrachten wie eingangs erwähnt keine Kanten zwischen den Knoten. Wir haben uns einen Ansatz überlegt, der mit orthogonalen Kantenroutings arbeitet, und der sich in zumindest den letzten dieser Ansätze integrieren ließe. Zunächst würden wir die Knicke innerhalb der Kanten als punktförmige Knoten modellieren. Um die Orthogonalität sicherzustellen, müssen die $x$- bzw. $y$-Koordinaten von zwei aufeinanderfolgenden Knicken aneinander gekoppelt werden. Knick-Knoten-Überlappungen können dann mit Nebenbedingungen vom Typ \ref{eqn:overlap:h1} bis \ref{eqn:overlap:v2} verhindert werden, wie oben dargestellt. Seien nun $a$ und $b$ zwei Knicke auf einem vertikalen Kantensegment (also $X_a = X_b$) und sei $i$ ein Knoten. Knoten-Kanten-Überlappungen lassen sich verhindern durch Nebenbedingungen von dieser Art:
+
+\begin{align}
+	Y_a &> Y_{i} + h_i &&- M \cdot A^{a,b,i} & - M \cdot B^{a,b,i} \label{eqn:edgeover:v1} \\
+	Y_b &> Y_{i} + h_i &&- M \cdot A^{a,b,i} & - M \cdot B^{a,b,i} \label{eqn:edgeover:v2}\\
+	Y_a &< Y_{i}  &&+ M \cdot A^{a,b,i} & + M - M \cdot B^{a,b,i} \label{eqn:edgeover:v3}\\
+	Y_b &< Y_{i}  &&+ M \cdot A^{a,b,i} & + M - M \cdot B^{a,b,i} \label{eqn:edgeover:v4}\\
+	X_a &< X_i &&+ M - M \cdot A^{a,b,i} & + M \cdot B^{a,b,i} \label{eqn:edgeover:h1}\\
+	X_a &> X_i + w_i &&- M + M \cdot A^{a,b,i} & -M + M \cdot B^{a,b,i} \label{eqn:edgeover:h2}
+\end{align}
+
+Die Bedingungen \ref{eqn:edgeover:v1} bis \ref{eqn:edgeover:v4} stehen hierbei dafür, dass die Strecke vollständig über oder unter dem Knoten liegt, während Bedingungen \ref{eqn:edgeover:h1} und \ref{eqn:edgeover:h2} für ein Nebeneinander stehen. Umgeschaltet wird zwischen diesen mittels der boolschen Variable $A$. Die Boolsche Variable $B$ schaltet jeweils zwischen den Bedingungen für links und rechst bzw. oben oder unten um.
+
+Diese Modellierung erlaubt noch keine Knicke zusätzlich zu denen, die schon im Ausgangslayout vorhanden sind. Dies ließe sich umsetzen, indem auf jedem Abschnitt einer Kante zusätzliche Pseudoknicke eingefügt werden, die vom ILP dann genutzt werden können. Zur Knickminimierung ist es hilfreich, die Anzahl der genutzten Pseudoknicke in die Optimierungsfunktion mit aufzunehmen. Es bietet sich an, pro Abschnitt $4$ solcher Pseudoknicke einzufügen, da mit $4$ Knicken in jedem Fall ein Knoten umlaufen werden kann. TODO Zeichnung? Sollten für ein optimales Ergebnis mehr als $4$ zusätzliche Knicke auf einem Kantenabschnitt benötigt werden, so ist eine Lösung ähnlich der in Abschnitt TODO vorgestellten denkbar: Stellt man nach der Lösung des ILPs fest, dass alle Pseudoknicke auf einem Abschnitt verwendet wurden, so fügt man in die neu entstandenen Abschnitte wiederum je $4$ Pseudoknicke ein und lässt das ILP erneut lösen.
+
+Offensichtlich steigert diese Art, Kantenroutings zu betrachten, die Komplexität des ILPs nocheinmal beträchtlich. Wir haben daher Zweifel daran, dass dies in der Praxis eine nützliche Erweiterung der vorgestellten ILPs ist.
