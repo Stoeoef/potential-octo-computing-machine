@@ -11,7 +11,7 @@ Rahmen des Seminars erläutert.
 Die GUI ist eine Webanwendung, welche mit Javascript programmiert wurde. Hierzu wurden
 die Javascript-Bibliotheken Cytoscape.js\cite{cytoscape} und Angular.js\cite{angularjs} benutzt. Cytoscape.js bietet bereits
 Funktionalitäten, um einen Graphen darzustellen und zu manipulieren. Angular.js wurde als
-Javascript Framework benutzt, um die Interaktion mit Html und Javascript zu erleichtern.
+Javascript Framework benutzt, um die Interaktion mit HTML und Javascript zu erleichtern.
 Ansonsten wurde reines Javascript benutzt, um die weiteren Features zu implementieren.
 
 Da diese Arbeit sich auf das inkrementelle Einfügen von Knoten fokussiert, wurde der Editor
@@ -66,7 +66,7 @@ importieren, falls diese in der \textit{.graphml}-Datei vorhanden sind.
 
 Die Anforderung der Philosophiestudenten war, dass der Graph sich nur wenig ändern sollte,
 wenn ein Knoten eingefügt wird. Die verschiedenen Modi dienen dazu, dass der Benutzer
-entscheiden kann, wieviel sich im Graphen ändert. Hier muss angemerkt werden, dass nur
+entscheiden kann, wie viel sich im Graphen ändert. Hier muss angemerkt werden, dass nur
 der erste Modus garantieren kann, dass sich orthogonale Kanten nicht überlappen würden.
 Da diese Arbeit sich jedoch ausschließlich auf die Position der Knoten bezieht und die Kanten
 ausklammert, wird dieses Problem nicht weiter diskutiert.
@@ -83,7 +83,7 @@ Benutzer auch wie ein neu eingefügter Knoten positioniert werden soll. Der Benu
 jedoch nicht darauf angewiesen diese Layoutfunktionen zu benutzen. Ohne eine Anpassung
 vom Benutzer versucht der ILP-Algorithmus eine optimale (und somit in den meisten Fällen
 eine für den Benutzer wünschenswerte) Lösung zu finden.
- Die GUI bietet dem Benutzer Funktionen um schnell einen Graphen inkremetell aufzubauen
+ Die GUI bietet dem Benutzer Funktionen um schnell einen Graphen inkrementell aufzubauen
 und zugleich hat er die Freiheit selbst mit zu entscheiden, wie er den Graphen gestaltet.
 
 
@@ -97,7 +97,7 @@ Beim Backend haben wir auf eine Implementierung in Python unter Zuhilfenahme des
 \subsubsection{Abweichungen vom beschriebenen ILP}
 \label{sub:impl:opt}
 
-Zunächst haben wir wie in Abschnitt \ref{sub:ilp:2} schon angedeutet versucht, die Anzahl der Bedingungen, die für Überlappungsfreiheit sorgen werden, auf eine sub-quadratische Anzahl zu senken. Eine hilfreiche Beobachtung ist hier, dass viele dieser Bedingungen nicht benötigt werden, da die entsprechenden Knoten aufgrund des Abstands zueinander im Ausgangslayout sowieso nicht überlappen werden. Wir fügen daher dem ILP anfangs nur entsprechende Bedingungen für adjazente Knoten hinzu, und werden weitere Bedingungen nur dann ins ILP aufnehmen, wenn sie benötigt werden. Unser erster Ansatz war hier, die Callback-Funktionalität von Gurobi zu nutzen. Dies erwies sich allerdings als unnötig aufwändig, da diese Callbacks teilweise nur unter sehr speziellen Bedingungen aufgerufen werden. Eine einfachere und effiziente Lösung ist es, nach Lösung des ILPs durch Gurobi alle Knoten auf Überlappungen zu testen, bei Bedarf neue Bedingungen einzufügen und das bereits gelöste, aber veränderte Modell von Gurobi erneut lösen zu lassen. Im Normalfall ist eine neue Lösung, die die zusätzlichen Bedingungen berücksichtig, dann in sehr kurzer Zeit gefunden. Dies wiederholen wir so lange, bis keine Überlappungen mehr auftreten. In unseren Tests sind im Normalfall nicht mehr als eine oder zwei Wiederholungen nötig gewesen.
+Zunächst haben wir wie in Abschnitt \ref{sub:ilp:2} schon angedeutet versucht, die Anzahl der Bedingungen, die für Überlappungsfreiheit sorgen werden, auf eine sub-quadratische Anzahl zu senken. Eine hilfreiche Beobachtung ist hier, dass viele dieser Bedingungen nicht benötigt werden, da die entsprechenden Knoten aufgrund des Abstands zueinander im Ausgangslayout sowieso nicht überlappen werden. Wir fügen daher dem ILP anfangs nur entsprechende Bedingungen für adjazente Knoten hinzu, und werden weitere Bedingungen nur dann ins ILP aufnehmen, wenn sie benötigt werden. Unser erster Ansatz war hier, die Callback-Funktionalität von Gurobi zu nutzen. Dies erwies sich allerdings als unnötig aufwändig, da diese Callbacks teilweise nur unter sehr speziellen Bedingungen aufgerufen werden. Eine einfachere und effiziente Lösung ist es, nach Lösung des ILPs durch Gurobi alle Knoten auf Überlappungen zu testen, bei Bedarf neue Bedingungen einzufügen und das bereits gelöste, aber veränderte Modell von Gurobi erneut lösen zu lassen. Im Normalfall ist eine neue Lösung, die die zusätzlichen Bedingungen berücksichtigt, dann in sehr kurzer Zeit gefunden. Dies wiederholen wir so lange, bis keine Überlappungen mehr auftreten. In unseren Tests sind im Normalfall nicht mehr als eine oder zwei Wiederholungen nötig gewesen.
 
 Eine weitere Besonderheit ist, dass wir für die Vektor-Vektor-Abstände, wie sie z.B. in der Optimierungsfunktion \ref{eqn:opt:complete} vorkommen, die 1-Norm statt der intuitiv vielleicht sinnvolleren 2-Norm verwendet haben. Dies hat den Grund, dass sich die 2-Norm in einem Integer \textit{Linear} Program nicht abbilden lässt. Es wäre an dieser Stelle zwar möglich ein Integer \textit{Quadratic} Program stattdessen aufzustellen (und von Gurobi lösen zu lassen), allerdings wollten wir die Komplexität zunächst auf ein ILP beschränken.
 
