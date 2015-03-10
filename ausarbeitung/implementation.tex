@@ -90,4 +90,37 @@ und zugleich hat er die Freiheit selbst mit zu entscheiden, wie er den Graphen g
 
 \subsection{Backend}
 
-Das Backend hat vor allem die Aufgabe, nach einer erfolgten Einfügung ein neues Layout zu berechnen, welches die zu Beginn dieser Arbeit vorgestellte Optimierungsfunktion \ref{eqn:opt:complete} in gewissem Rahmen optimiert. Hierfür haben wir das in Abschnitt \ref{sub:ilp:2} vorgestellte ILP mit einigen Anpassungen implementiert.
+Das Backend hat vor allem die Aufgabe, nach einer erfolgten Einfügung ein neues Layout zu berechnen, welches die zu Beginn dieser Arbeit vorgestellte Optimierungsfunktion \ref{eqn:opt:complete} in gewissem Rahmen optimiert. Hierfür haben wir das in Abschnitt \ref{sub:ilp:2} vorgestellte ILP, das Vertauschungen von Knoten in begrenztem Maße zulässt, mit einigen Anpassungen implementiert.
+
+Beim Backend haben wir auf eine Implementierung in Python unter Zuhilfenahme des Django-Webframeworks\cite{django} gesetzt, die mit der GUI über Ajax kommuniziert. Für die Lösung des ILPs kommt Gurobi\cite{gurobi} zum Einsatz.
+
+\subsubsection{Abweichungen vom beschriebenen ILP}
+\label{sub:impl:opt}
+
+Zunächst haben wir wie in Abschnitt \ref{sub:ilp:2} schon angedeutet versucht, die Anzahl der Bedingungen, die für Überlappungsfreiheit sorgen werden, auf eine sub-quadratische Anzahl zu senken. Eine hilfreiche Beobachtung ist hier, dass viele dieser Bedingungen nicht benötigt werden, da die entsprechenden Knoten aufgrund des Abstands zueinander im Ausgangslayout sowieso nicht überlappen werden. Wir fügen daher dem ILP anfangs nur entsprechende Bedingungen für adjazente Knoten hinzu, und werden weitere Bedingungen nur dann ins ILP aufnehmen, wenn sie benötigt werden. Unser erster Ansatz war hier, die Callback-Funktionalität von Gurobi zu nutzen. Dies erwies sich allerdings als unnötig aufwändig, da diese Callbacks teilweise nur unter sehr speziellen Bedingungen aufgerufen werden. Eine einfachere und effiziente Lösung ist es, nach Lösung des ILPs durch Gurobi alle Knoten auf Überlappungen zu testen, bei Bedarf neue Bedingungen einzufügen und das bereits gelöste, aber veränderte Modell von Gurobi erneut lösen zu lassen. Im Normalfall ist eine neue Lösung, die die zusätzlichen Bedingungen berücksichtig, dann in sehr kurzer Zeit gefunden. Dies wiederholen wir so lange, bis keine Überlappungen mehr auftreten. In unseren Tests sind im Normalfall nicht mehr als eine oder zwei Wiederholungen nötig gewesen.
+
+Eine weitere Besonderheit ist, dass wir für die Vektor-Vektor-Abstände, wie sie z.B. in der Optimierungsfunktion \ref{eqn:opt:complete} vorkommen, die 1-Norm statt der intuitiv vielleicht sinnvolleren 2-Norm verwendet haben. Dies hat den Grund, dass sich die 2-Norm in einem Integer \textit{Linear} Program nicht abbilden lässt. Es wäre an dieser Stelle zwar möglich ein Integer \textit{Quadratic} Program stattdessen aufzustellen (und von Gurobi lösen zu lassen), allerdings wollten wir die Komplexität zunächst auf ein ILP beschränken.
+
+Des Weiteren haben wir zusätzlich eine Klasse von Bedingungen eingebaut, die es ermöglicht, mehrere Knoten auf dieselbe $x$- oder $y$-Koordinate zu zwingen. Dies ist vor allem auf den in Abschnitt \ref{sub:tasks} angesprochenen Wunsch zurückzuführen, mehrere Knoten aneinander "`ausrichten"' zu können.
+
+Eine weitere Optimierung, die die Zeit, die zum Lösen des Systems stark senkt, ist, dass wir die Positionen aller Knoten im Ausgangslayout an die von Gurobi verwendeten Heuristiken zum Finden einer Startlösung übergeben.
+
+\subsection{Ergebnisse}
+
+Wir haben den von uns entwickelten Prototypen mit einigen bereitgestellten GraphML-Dateien getestet. Die Instanzen hatten eher kleine Größen von ca. 20 Knoten. Auf diesen Instanzen wurde das ILP von Gurobi nahezu in Echtzeit gelöst.
+
+\begin{figure}
+	\begin{center}
+		\includegraphics{figures/order.pdf}
+		\caption{Problematische Einfügung}
+		\label{fig:order-too-strict}
+	\end{center}
+\end{figure}
+
+Die wichtigste Beobachtung ist, dass die Einschränkung, nur direkt benachbarte Paare von Knoten tauschen zu dürfen, für realistische Instanzgrößen unpraktikabel ist. Am Beispiel von Abbildung \ref{fig:order-too-strict} wird dies deutlich: Der schraffierte Knoten sollte an der Position, die durch das Kreuz angezeigt wird, eingefügt werden. Die Position, an der der schraffierte Knoten jetzt gezeichnet wurde, wäre vermutlich eine gute Wahl. Um hier platziert zu werden, müsste er allerdings (relativ zu der Position des Kreuzes und der links-oberen Ecken der Knoten) in der horizontalen Reihenfolge die Positionen mit den Knoten $1, 2$ und $3$ tauschen, was in diesem eingeschränkten Modell nicht möglich ist. Dieses Problem wird umso ausgeprägter, je größer die Instanzen werden. TODO mehr dazu
+
+Beobachtet haben wir außerdem, dass der neu eingefügte Knoten unserem Gefühl nach häufig zu weit von der Position, an der man ihn hat einfügen wollen, platziert wurde. Außerdem wurde unserem Gefühl nach die Möglichkeit der Skalierung gegenüber der Verschiebung von Knoten (siehe Abschnitt \ref{par:scale}) zu intensiv genutzt wurde. Dies ist zurückzuführen auf die Wahl der Konstanten $\alpha, \beta$ und $\gamma$ in der Optimierungsfunktion \ref{eqn:opt:complete}.
+
+
+
+TODO größere Instanzen?

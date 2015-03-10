@@ -5,7 +5,8 @@ gurobi.log
 .idea
 server/db.sqlite3
 
-
+*.bbl
+*.blg
 *.out
 *.aux
 *.log

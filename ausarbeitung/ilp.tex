@@ -4,7 +4,7 @@ Allgemein haben wir uns entschieden, Kanten in diesen Modellen nicht zu berücks
 
 \subsection{Statische Reihenfolge}
 
-Wir haben uns entschieden, neben der in \ref{eqn:opt:complete} formulierten Optimierungsfunktion noch etwas schärfere Maßstäbe anzulegen, und die horizontale und vertikale Reihenfolge der Knoten jedenfalls annähernd zu fixieren. Dies ergibt sich vor allem auch aus den in Abschnitt \ref{sub:tasks} gestellten Anforderungen.
+Wir haben uns entschieden, neben der in \ref{eqn:opt:complete} formulierten Optimierungsfunktion noch etwas schärfere Maßstäbe anzulegen, und die horizontale und vertikale Reihenfolge der Knoten jedenfalls annähernd zu fixieren. Dies ergibt sich vor allem auch aus den in Abschnitt \ref{sub:tasks} gestellten Anforderungen. Als (horizontale oder vertikale) \textit{Reihenfolge} werden wir im Folgenden immer die Ordnung der Knoten entlang ihrer $x$- oder $y$-Koordinaten verstehen. Wir nennen zwei Knoten \textit{benachbart}, wenn sie in einer dieser Reihenfolgen aufeinander folgen.
 
 Legt man sich fest, diese Reihenfolgen beim Finden eines neuen Layouts tatsächlich nicht zu verändern, und ist außerdem vorgegeben, an welcher Stelle der neue Knoten jeweils in die Reihenfolgen einzufügen ist, so lässt sich sogar ein Lineares Programm formulieren, das \ref{eqn:opt:complete} unter dieser Bedingung optimiert.\footnote{Andernfalls ist dies nicht möglich: Wenn es erlaubt ist, Knoten $A$ links oder rechts von $B$ zu platzieren, so ist die Bedingung zur Überlappungsfreiheit nicht ohne eine Integer-Variable zu formulieren.} Dieses LP hat nur eine Art von Nebenbedingungen, nämlich die, die für jedes Paar von (geometrisch) benachbarten Knoten die Überlappungsfreiheit sicherstellt. Dies ist eine starke Einschränkung: Prinzipiell ist es in einer gültigen Zeichnung erlaubt, dass zwei Knoten sich entweder horizontal oder vertikal überlappen, nicht jedoch beides. Im Linearen Programm muss nun festgelegt werden, in welcher Dimension zwei (benachbarte) Knoten sich nicht überlappen dürfen, eine Formulierung "`Entweder horizontal oder vertikal"' ist ohne Integer-Variablen nicht möglich. Ansonsten können die Terme aus \ref{eqn:opt:complete} direkt als Optimierungsfunktion übernommen werden.
 
@@ -32,7 +32,7 @@ Aufgrund dieser allgemeineren Bedingungen für die Überlappungsfreiheit müssen
 
 Außerdem möchten wir die Anzahl der Vertauschungen nach wie vor minimieren, somit muss die Summe aller $I^{\{v,h\}}_{i,j}$ entsprechend gewichtet mit in die Optimierungsfunktion aufgenommen werden.
 
-Dieser Ansatz erzeugt mit den Bedingungen zur Überlappungsfreiheit eine quadratische Anzahl von Nebenbedingungen und Integer-Variablen. In der Praxis (siehe Abschnitt TODO) können diese aber im Normalfall drastisch reduziert werden.
+Dieser Ansatz erzeugt mit den Bedingungen zur Überlappungsfreiheit eine quadratische Anzahl von Nebenbedingungen und Integer-Variablen. In der Praxis (siehe Abschnitt \ref{sub:impl:opt}) können diese aber im Normalfall drastisch reduziert werden.
 
 \subsection{Beliebige Vertauschungen}
 
@@ -62,4 +62,4 @@ Die Bedingungen \ref{eqn:edgeover:v1} bis \ref{eqn:edgeover:v4} stehen hierbei d
 
 Diese Modellierung erlaubt noch keine Knicke zusätzlich zu denen, die schon im Ausgangslayout vorhanden sind. Dies ließe sich umsetzen, indem auf jedem Abschnitt einer Kante zusätzliche Pseudoknicke eingefügt werden, die vom ILP dann genutzt werden können. Zur Knickminimierung ist es hilfreich, die Anzahl der genutzten Pseudoknicke in die Optimierungsfunktion mit aufzunehmen. Es bietet sich an, pro Abschnitt $4$ solcher Pseudoknicke einzufügen, da mit $4$ Knicken in jedem Fall ein Knoten umlaufen werden kann. TODO Zeichnung? Sollten für ein optimales Ergebnis mehr als $4$ zusätzliche Knicke auf einem Kantenabschnitt benötigt werden, so ist eine Lösung ähnlich der in Abschnitt TODO vorgestellten denkbar: Stellt man nach der Lösung des ILPs fest, dass alle Pseudoknicke auf einem Abschnitt verwendet wurden, so fügt man in die neu entstandenen Abschnitte wiederum je $4$ Pseudoknicke ein und lässt das ILP erneut lösen.
 
-Offensichtlich steigert diese Art, Kantenroutings zu betrachten, die Komplexität des ILPs nocheinmal beträchtlich. Wir haben daher Zweifel daran, dass dies in der Praxis eine nützliche Erweiterung der vorgestellten ILPs ist.
+Offensichtlich steigert diese Art Kantenroutings zu betrachten die Komplexität des ILPs nocheinmal beträchtlich. Wir haben daher Zweifel daran, dass dies in der Praxis eine nützliche Erweiterung der vorgestellten ILPs ist.

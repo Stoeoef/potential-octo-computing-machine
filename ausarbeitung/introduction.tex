@@ -58,6 +58,7 @@ Zusätzlich muss noch die Position des neu einzufügenden Knotens berücksichtig
 \end{equation}
 
 \begin{paragraph}{Verschiebung versus Skalierung}
+  \label{par:scale}
   Wenn wir für einen Moment davon ausgehen, dass das neue Layout nicht überlappungsfrei sein muss, so werden (eine geeignete Wahl von $\psi$ vorausgesetzt) die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic} optimiert (zu Null) dadurch, dass alle alten Knoten auf ihren Plätzen bleiben und der neue Knoten am gewünschten Punkt (mit alten Knoten überlappend) eingefügt wird. Ausgehend von diesem Layout sehen wir zwei grundlegend verschiedene Möglichkeiten, den notwendigen Platz für ein überlappungsfreies Layout zu schaffen: Zunächst können natürlich einfach einzelne Knoten verschoben werden. Dies "`verzerrt"' die relativen Positionen von Knoten und erhöht die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic}. Andererseits ist es aber auch möglich, einfach alle Kantenlängen mit einem gewissen Faktor zu multiplizieren, was dadurch, dass das Layout insgesamt größer wird, äquivalent dazu ist, die Knotengrößen kleiner zu skalieren. Diese zweite Möglichkeit erhöht ebenfalls beide Summen, wir halten dies allerdings eigentlich für falsch: Für den Betrachter ändert sich nicht die relative Lage der Knoten zueinander, die Knoten werden nur kleiner. Wir führen daher einen Skalierungsfaktor $c$ ein. Natürlich muss $c$ so gewählt werden, dass er möglichst nah an $1$ gelegen ist. Insgesamt ergibt sich somit als Optimierungsfunktion:
 \end{paragraph}
 
