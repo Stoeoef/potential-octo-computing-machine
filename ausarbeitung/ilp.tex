@@ -8,7 +8,7 @@ Wir haben uns entschieden, neben der in \ref{eqn:opt:complete} formulierten Opti
 
 Legt man sich fest, diese Reihenfolgen beim Finden eines neuen Layouts tatsächlich nicht zu verändern, und ist außerdem vorgegeben, an welcher Stelle der neue Knoten jeweils in die Reihenfolgen einzufügen ist, so lässt sich sogar ein Lineares Programm formulieren, das \ref{eqn:opt:complete} unter dieser Bedingung optimiert.\footnote{Andernfalls ist dies nicht möglich: Wenn es erlaubt ist, Knoten $A$ links oder rechts von $B$ zu platzieren, so ist die Bedingung zur Überlappungsfreiheit nicht ohne eine Integer-Variable zu formulieren.} Dieses LP hat nur eine Art von Nebenbedingungen, nämlich die, die für jedes Paar von (geometrisch) benachbarten Knoten die Überlappungsfreiheit sicherstellt. Dies ist eine starke Einschränkung: Prinzipiell ist es in einer gültigen Zeichnung erlaubt, dass zwei Knoten sich entweder horizontal oder vertikal überlappen, nicht jedoch beides. Im Linearen Programm muss nun festgelegt werden, in welcher Dimension zwei (benachbarte) Knoten sich nicht überlappen dürfen. Eine Formulierung "`Entweder horizontal oder vertikal"' ist ohne Integer-Variablen nicht möglich. Ansonsten können die Terme aus \ref{eqn:opt:complete} direkt als Optimierungsfunktion übernommen werden.
 
-TODO doppel-halbordnung
+Eine interessante Beobachtung ist an dieser Stelle, dass wir zwei vollständige Ordnungen auf den Knoten definieren und erzwingen (eine horizontale und eine vertikale), während eventuell zwei Halbordnungen ausreichend wären: Für Knoten, die weit voneinander entfernt, und somit visuell nicht in einem Zusammenhang stehen, muss vermutlich nicht zwangsläufig festgelegt sein, in welcher Reihenfolge diese stehen. Genause verhält es sich mit Knoten, die einander horizontal oder vertikal überlappen: Aktuell legen wir hier willkürlich durch Wahl der linken oberen Ecke beziehungsweise durch ein Tie Breaking eine Reihenfolge fest, die vermutlich nicht zwangsläufig hilfreich ist. Um die Überlappungsfreiheit in einem LP gewährleisten zu können, ist dies allerdings notwendig.
 
 \subsection{Begrenzte Vertauschungen}
 \label{sub:ilp:2}
@@ -30,7 +30,9 @@ Aufgrund dieser allgemeineren Bedingungen für die Überlappungsfreiheit müssen
 	X_i < X_j + M \cdot I^{h}_{i,j}
 \end{align}
 
-Außerdem möchten wir die Anzahl der Vertauschungen nach wie vor minimieren, somit muss die Summe aller $I^{\{v,h\}}_{i,j}$ entsprechend gewichtet mit in die Optimierungsfunktion aufgenommen werden.
+Welche Vertauschungen dies erlaubt, wird in Abbildung \ref{fig:neighbors} für die horizontale Reihenfolge deutlich: Die grünen, durchgezogenen Pfeile stellen hier erlaubte Vertauschungen dar, während die roten, gepunkteten Pfeile Beispiele für nicht erlaubte Vertauschungen darstellen. Wollte man beispielsweise Knoten $1$ und $3$ tauschen, so müsste Knoten $2$ in der horizontalen Reihenfolge "übersprungen" werden, was nicht erlaubt ist.
+
+Auch wenn Vertauschungen hier in begrentztem Maß erlaubt sind, möchten wir die Anzahl der Vertauschungen nach wie vor minimieren, somit muss die Summe aller $I^{\{v,h\}}_{i,j}$ entsprechend gewichtet mit in die Optimierungsfunktion aufgenommen werden.
 
 Dieser Ansatz erzeugt mit den Bedingungen zur Überlappungsfreiheit eine quadratische Anzahl von Nebenbedingungen und Integer-Variablen. In der Praxis (siehe Abschnitt \ref{sub:impl:opt}) können diese aber im Normalfall drastisch reduziert werden.
 
@@ -60,6 +62,23 @@ Die bisher vorgestellten ILPs betrachten wie eingangs erwähnt keine Kanten zwis
 
 Die Bedingungen \ref{eqn:edgeover:v1} bis \ref{eqn:edgeover:v4} stehen hierbei dafür, dass die Strecke vollständig über oder unter dem Knoten liegt, während Bedingungen \ref{eqn:edgeover:h1} und \ref{eqn:edgeover:h2} für ein Nebeneinander stehen. Umgeschaltet wird zwischen diesen mittels der booleschen Variable $A$. Die Boolesche Variable $B$ schaltet jeweils zwischen den Bedingungen für links und rechst bzw. oben oder unten um.
 
-Diese Modellierung erlaubt noch keine Knicke zusätzlich zu denen, die schon im Ausgangslayout vorhanden sind. Dies ließe sich umsetzen, indem auf jedem Abschnitt einer Kante zusätzliche Pseudoknicke eingefügt werden, die vom ILP dann genutzt werden können. Zur Knickminimierung ist es hilfreich, die Anzahl der genutzten Pseudoknicke in die Optimierungsfunktion mit aufzunehmen. Es bietet sich an, pro Abschnitt $4$ solcher Pseudoknicke einzufügen, da mit $4$ Knicken in jedem Fall ein Knoten umlaufen werden kann. TODO Zeichnung? Sollten für ein optimales Ergebnis mehr als $4$ zusätzliche Knicke auf einem Kantenabschnitt benötigt werden, so ist eine Lösung ähnlich der in Abschnitt TODO vorgestellten denkbar: Stellt man nach der Lösung des ILPs fest, dass alle Pseudoknicke auf einem Abschnitt verwendet wurden, so fügt man in die neu entstandenen Abschnitte wiederum je $4$ Pseudoknicke ein und lässt das ILP erneut lösen.
+
+\begin{figure}
+\centering
+\begin{minipage}{.2\textwidth}
+  \centering
+	\includegraphics[width=.8\linewidth]{figures/umlauf.pdf}
+	\caption{Umlaufung}
+	\label{fig:goaround}
+\end{minipage}%
+\begin{minipage}{.8\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/neighbors.pdf}
+  \captionof{figure}{Nachbarn}
+  \label{fig:neighbors}
+\end{minipage}
+\end{figure}
+
+Diese Modellierung erlaubt noch keine Knicke zusätzlich zu denen, die schon im Ausgangslayout vorhanden sind. Dies ließe sich umsetzen, indem auf jedem Abschnitt einer Kante zusätzliche Pseudoknicke eingefügt werden, die vom ILP dann genutzt werden können. Zur Knickminimierung ist es hilfreich, die Anzahl der genutzten Pseudoknicke in die Optimierungsfunktion mit aufzunehmen. Es bietet sich an, pro Abschnitt $4$ solcher Pseudoknicke einzufügen, da mit $4$ Knicken in jedem Fall ein Knoten umlaufen werden kann, wie in Abbildung \ref{fig:goaround} zu sehen. Sollten für ein optimales Ergebnis mehr als $4$ zusätzliche Knicke auf einem Kantenabschnitt benötigt werden, so ist eine Lösung ähnlich der in Abschnitt \ref{sub:impl:opt} für die Bedingungen zur Überlappungsfreiheit vorgestellten denkbar: Stellt man nach der Lösung des ILPs fest, dass alle Pseudoknicke auf einem Abschnitt verwendet wurden, so fügt man in die neu entstandenen Abschnitte wiederum je $4$ Pseudoknicke ein und lässt das ILP erneut lösen.
 
 Offensichtlich steigert diese Art Kantenroutings zu betrachten die Komplexität des ILPs noch einmal beträchtlich. Wir haben daher Zweifel daran, dass dies in der Praxis eine nützliche Erweiterung der vorgestellten ILPs ist.
