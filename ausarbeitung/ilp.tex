@@ -6,7 +6,7 @@ Allgemein haben wir uns entschieden, Kanten in diesen Modellen nicht zu berücks
 
 Wir haben uns entschieden, neben der in \ref{eqn:opt:complete} formulierten Optimierungsfunktion noch etwas schärfere Maßstäbe anzulegen, und die horizontale und vertikale Reihenfolge der Knoten jedenfalls annähernd zu fixieren. Dies ergibt sich vor allem auch aus den in Abschnitt \ref{sub:tasks} gestellten Anforderungen. Als (horizontale oder vertikale) \textit{Reihenfolge} werden wir im Folgenden immer die Ordnung der Knoten entlang ihrer $x$- oder $y$-Koordinaten verstehen. Wir nennen zwei Knoten \textit{benachbart}, wenn sie in einer dieser Reihenfolgen aufeinander folgen.
 
-Legt man sich fest, diese Reihenfolgen beim Finden eines neuen Layouts tatsächlich nicht zu verändern, und ist außerdem vorgegeben, an welcher Stelle der neue Knoten jeweils in die Reihenfolgen einzufügen ist, so lässt sich sogar ein Lineares Programm formulieren, das \ref{eqn:opt:complete} unter dieser Bedingung optimiert.\footnote{Andernfalls ist dies nicht möglich: Wenn es erlaubt ist, Knoten $A$ links oder rechts von $B$ zu platzieren, so ist die Bedingung zur Überlappungsfreiheit nicht ohne eine Integer-Variable zu formulieren.} Dieses LP hat nur eine Art von Nebenbedingungen, nämlich die, die für jedes Paar von (geometrisch) benachbarten Knoten die Überlappungsfreiheit sicherstellt. Dies ist eine starke Einschränkung: Prinzipiell ist es in einer gültigen Zeichnung erlaubt, dass zwei Knoten sich entweder horizontal oder vertikal überlappen, nicht jedoch beides. Im Linearen Programm muss nun festgelegt werden, in welcher Dimension zwei (benachbarte) Knoten sich nicht überlappen dürfen, eine Formulierung "`Entweder horizontal oder vertikal"' ist ohne Integer-Variablen nicht möglich. Ansonsten können die Terme aus \ref{eqn:opt:complete} direkt als Optimierungsfunktion übernommen werden.
+Legt man sich fest, diese Reihenfolgen beim Finden eines neuen Layouts tatsächlich nicht zu verändern, und ist außerdem vorgegeben, an welcher Stelle der neue Knoten jeweils in die Reihenfolgen einzufügen ist, so lässt sich sogar ein Lineares Programm formulieren, das \ref{eqn:opt:complete} unter dieser Bedingung optimiert.\footnote{Andernfalls ist dies nicht möglich: Wenn es erlaubt ist, Knoten $A$ links oder rechts von $B$ zu platzieren, so ist die Bedingung zur Überlappungsfreiheit nicht ohne eine Integer-Variable zu formulieren.} Dieses LP hat nur eine Art von Nebenbedingungen, nämlich die, die für jedes Paar von (geometrisch) benachbarten Knoten die Überlappungsfreiheit sicherstellt. Dies ist eine starke Einschränkung: Prinzipiell ist es in einer gültigen Zeichnung erlaubt, dass zwei Knoten sich entweder horizontal oder vertikal überlappen, nicht jedoch beides. Im Linearen Programm muss nun festgelegt werden, in welcher Dimension zwei (benachbarte) Knoten sich nicht überlappen dürfen. Eine Formulierung "`Entweder horizontal oder vertikal"' ist ohne Integer-Variablen nicht möglich. Ansonsten können die Terme aus \ref{eqn:opt:complete} direkt als Optimierungsfunktion übernommen werden.
 
 TODO doppel-halbordnung
 
@@ -22,7 +22,7 @@ Im nächsten Schritt wollen wir nun einige Vertauschungen in der Reihenfolge der
 	Y_i &> Y_j + h_j &&- M + M \cdot D_{i,j} &- M + M \cdot O^{v}_{i,j} \label{eqn:overlap:v2}
 \end{align}
 
-Bei ausreichend groß gewähltem $M$ werden die Bedingungen \ref{eqn:overlap:h1} und \ref{eqn:overlap:h2} eingeschaltet, wenn eine horizontale Überlappung verboten werden soll, und \ref{eqn:overlap:v1} und \ref{eqn:overlap:v2} andernfalls. Innerhalb dieser Gruppen werden jeweils mittels $O^{h}_{i,j}$ bzw. $O^{v}_{i,j}$ eine Bedingung ein- und eine ausgeschaltet.
+Bei ausreichend groß gewähltem $M$ werden die Bedingungen \ref{eqn:overlap:h1} und \ref{eqn:overlap:h2} eingeschaltet, wenn eine horizontale Überlappung verboten werden soll, andernfalls sind  \ref{eqn:overlap:v1} und \ref{eqn:overlap:v2} aktiv. Innerhalb dieser Gruppen werden mittels $O^{h}_{i,j}$ bzw. $O^{v}_{i,j}$ je eine Bedingung ein- beziehungsweise ausgeschaltet.
 
 Aufgrund dieser allgemeineren Bedingungen für die Überlappungsfreiheit müssen wir nun den Erhalt der Reihenfolge gesondert sicherstellen, falls zwei Knoten nicht vertauscht werden sollen. Für jedes Paar von benachbarten Knoten $i$ und $j$ fügen wir also eine Bedingung hinzu. Für ein horizontal benachbartes Paar, bei dem $i$ vor $j$ liegt beispielsweise:
 
@@ -36,13 +36,13 @@ Dieser Ansatz erzeugt mit den Bedingungen zur Überlappungsfreiheit eine quadrat
 
 \subsection{Beliebige Vertauschungen}
 
-Der naheliegende Nächste Schritt ist es, beliebige Vertauschungen in der Reihenfolge zuzulassen. Nun werden also die Vertauschungsindikatoren $I^{\{v,h\}}_{i,j}$ für \textit{alle} Paare $i,j$ von Knoten erstellt, und nicht nur für in der Ordnung benachbarte Knoten. In diesem Szenario müssen wir allerdings Transitivität sicherstellen: Wenn in der ursprünglichen (horizontalen) Ordnung $i$ vor $j$ und $j$ vor $k$ war (also auch $i$ vor $k$), und $(i,j)$ und $(j,k)$ vertauscht worden sind, dann muss auch $(i,k)$ vertauscht worden sein! In den Nebenbedingungen schlägt sich das nieder wie folgt:
+Der naheliegende nächste Schritt ist es, beliebige Vertauschungen in der Reihenfolge zuzulassen. Nun werden also die Vertauschungsindikatoren $I^{\{v,h\}}_{i,j}$ für \textit{alle} Paare $i,j$ von Knoten erstellt, und nicht nur für in der Ordnung benachbarte Knoten. In diesem Szenario müssen wir allerdings Transitivität sicherstellen: Wenn in der ursprünglichen (horizontalen) Ordnung $i$ vor $j$ und $j$ vor $k$ war (also auch $i$ vor $k$), und $(i,j)$ und $(j,k)$ vertauscht worden sind, dann muss auch $(i,k)$ vertauscht worden sein! In den Nebenbedingungen kann dies realisiert werden wie folgt:
 
 \begin{align}
 	\forall (i,j,k) \in V^3 : \forall t \in \{v,h\} :  I^{t}_{i,j} + I^{t}_{j,k} - 2 I^{t}_{i,k} \leq 0 \label{eqn:transitivity}
 \end{align}
 
-In diesem Szenario wird nun nicht nur die Anzahl der booleschen $I^{\{v,h\}}$-Variablen quadratisch in der Anzahl der Knoten, sondern die Anzahl der Nebenbedingungen vom Typ \ref{eqn:transitivity} sogar kubisch in dieser. Wir halten es für fraglich, ob dieses System für realistische Größen noch in praktikabler Laufzeit lösbar ist.
+In diesem Szenario wird nun nicht nur die Anzahl der booleschen $I^{\{v,h\}}$-Variablen quadratisch in der Anzahl der Knoten, sondern die Anzahl der Nebenbedingungen vom Typ \ref{eqn:transitivity} sogar kubisch. Wir halten es für fraglich, ob dieses System für realistische Größen noch in praktikabler Laufzeit lösbar ist.
 
 \subsection{Kantenrouting}
 \label{sub:edgeroute}
