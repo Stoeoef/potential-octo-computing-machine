@@ -21,25 +21,25 @@ eingefügter Knoten mit einem bestehenden Knoten überlappt, indem für den neue
 genug Platz geschaffen wird. Der Algorithmus um Platz zu schaffen unterstützt die vier
 folgenden Modi:
 
-\begin{itemize}
-	\item es wird Platz gemacht, indem alle Knoten in eine der vier orthogonalen Richtungen
+\begin{enumerate}
+	\item Es wird Platz gemacht, indem alle Knoten in eine der vier orthogonalen Richtungen
 verschoben werden, damit unmittelbar links, rechts, oberhalb und unterhalb von dem
 neuen Knoten kein anderer Knoten sich befindet. Alle Knoten, die in die gleiche
 Richtung verschoben werden, werden um den gleichen Betrag verschoben. Dieser
 Betrag wird so bestimmt, dass alle Knoten einen minimalen Abstand von dem
 eingefügten Knoten einhalten.
-	\item der erste Modus aber es wird nur links und rechts Platz gemacht.
-	\item der erste Modus aber es wird nur oben und unten Platz gemacht.
-	\item die Knoten werden um den gleichen Betrag nach außen verschoben, damit kein
+	\item Wie 1., aber es wird nur links und rechts Platz gemacht.
+	\item Wie 1., aber es wird nur oben und unten Platz gemacht.
+	\item Die Knoten werden um den gleichen Betrag nach außen verschoben, damit kein
 anderer Knoten mit dem Neuen überlappt
-\end{itemize}
+\end{enumerate}
 
 In jedem Modus wird ein Mindestabstand zwischen dem neu eingefügten Knoten und allen
 anderen eingehalten. Somit kommt es zu keinen Überlappungen der Knoten, die zu nah
-beieinander sind. Abhängig vom Modus der gerade aktiv ist zeigt die GUI ein entsprechendes
-Overlay um anzuzeigen, wo überall Platz gemacht wird. Nachdem ein Knoten mit einem der
+beieinander sind. Abhängig vom Modus, der gerade aktiv ist, zeigt die GUI ein entsprechendes
+Overlay, um anzuzeigen, wo überall Platz gemacht wird. Nachdem ein Knoten mit einem der
 vier Modi eingefügt wurde, kann dessen Größe festgelegt werden. Anschließend hat der
-Benutzer die Möglichkeit über einen Button das Layout des Graphen anzupassen. Somit wird
+Benutzer die Möglichkeit, über einen Button das Layout des Graphen anzupassen. Somit wird
 der Platz, der vorher gemacht wurde, wieder minimiert, wobei versucht wird, gewisse
 Layoutbedingungen nicht zu verletzen (die wird näher in FIXME beschrieben).
 Des Weiteren zeigt jeder Knoten einen Titel und eine Beschreibung an. Somit können
@@ -71,20 +71,20 @@ der erste Modus garantieren kann, dass sich orthogonale Kanten nicht überlappen
 Da diese Arbeit sich jedoch ausschließlich auf die Position der Knoten bezieht und die Kanten
 ausklammert, wird dieses Problem nicht weiter diskutiert.
 
-Der anschließende Layoutalgorithmus versucht dann so weit es geht das ursprüngliche
+Der anschließende Layoutalgorithmus versucht dann, so weit es geht das ursprüngliche
 Layout wieder herzustellen. Wie ähnlich der Graph nach dem Einfügen des Knoten aussieht,
 hängt stark von der Position und der Größe des neuen Knoten ab. Die zusätzliche
-Ausrichtfunktion dient dazu, dass der Benutzer in das Layout eingreifen kann, und noch mehr
+Ausrichtfunktion dient dazu, dass der Benutzer in das Layout eingreifen und noch mehr
 mitbestimmen kann wie das endgültige Layout aussieht.
 
 Diese beiden Funktionen sind sinnvoll, da der Benutzer, welcher eine Argumentkarte erstellt,
 meistens bereits weiß, wie die Knoten angeordnet werden sollen. Insbesondere weiß der
-Benutzer auch wie ein neu eingefügter Knoten positioniert werden soll. Der Benutzer ist
-jedoch nicht darauf angewiesen diese Layoutfunktionen zu benutzen. Ohne eine Anpassung
+Benutzer auch, wie ein neu eingefügter Knoten positioniert werden soll. Der Benutzer ist
+jedoch nicht darauf angewiesen, diese Layoutfunktionen zu benutzen. Ohne eine Anpassung
 vom Benutzer versucht der ILP-Algorithmus eine optimale (und somit in den meisten Fällen
 eine für den Benutzer wünschenswerte) Lösung zu finden.
- Die GUI bietet dem Benutzer Funktionen um schnell einen Graphen inkrementell aufzubauen
-und zugleich hat er die Freiheit selbst mit zu entscheiden, wie er den Graphen gestaltet.
+ Die GUI bietet dem Benutzer Funktionen, um schnell einen Graphen inkrementell aufzubauen
+und zugleich hat er die Freiheit, selbst mit zu entscheiden, wie er den Graphen gestaltet.
 
 
 
@@ -99,11 +99,11 @@ Beim Backend haben wir auf eine Implementierung in Python unter Zuhilfenahme des
 
 Zunächst haben wir wie in Abschnitt \ref{sub:ilp:2} schon angedeutet versucht, die Anzahl der Bedingungen, die für Überlappungsfreiheit sorgen werden, auf eine sub-quadratische Anzahl zu senken. Eine hilfreiche Beobachtung ist hier, dass viele dieser Bedingungen nicht benötigt werden, da die entsprechenden Knoten aufgrund des Abstands zueinander im Ausgangslayout sowieso nicht überlappen werden. Wir fügen daher dem ILP anfangs nur entsprechende Bedingungen für adjazente Knoten hinzu, und werden weitere Bedingungen nur dann ins ILP aufnehmen, wenn sie benötigt werden. Unser erster Ansatz war hier, die Callback-Funktionalität von Gurobi zu nutzen. Dies erwies sich allerdings als unnötig aufwändig, da diese Callbacks teilweise nur unter sehr speziellen Bedingungen aufgerufen werden. Eine einfachere und effiziente Lösung ist es, nach Lösung des ILPs durch Gurobi alle Knoten auf Überlappungen zu testen, bei Bedarf neue Bedingungen einzufügen und das bereits gelöste, aber veränderte Modell von Gurobi erneut lösen zu lassen. Im Normalfall ist eine neue Lösung, die die zusätzlichen Bedingungen berücksichtigt, dann in sehr kurzer Zeit gefunden. Dies wiederholen wir so lange, bis keine Überlappungen mehr auftreten. In unseren Tests sind im Normalfall nicht mehr als eine oder zwei Wiederholungen nötig gewesen.
 
-Eine weitere Besonderheit ist, dass wir für die Vektor-Vektor-Abstände, wie sie z.B. in der Optimierungsfunktion \ref{eqn:opt:complete} vorkommen, die 1-Norm statt der intuitiv vielleicht sinnvolleren 2-Norm verwendet haben. Dies hat den Grund, dass sich die 2-Norm in einem Integer \textit{Linear} Program nicht abbilden lässt. Es wäre an dieser Stelle zwar möglich ein Integer \textit{Quadratic} Program stattdessen aufzustellen (und von Gurobi lösen zu lassen), allerdings wollten wir die Komplexität zunächst auf ein ILP beschränken.
+Eine weitere Besonderheit ist, dass wir für die Vektor-Vektor-Abstände, wie sie z.B. in der Optimierungsfunktion \ref{eqn:opt:complete} vorkommen, die 1-Norm statt der intuitiv vielleicht sinnvolleren 2-Norm verwendet haben. Dies hat den Grund, dass sich die 2-Norm in einem Integer \textit{Linear} Program nicht abbilden lässt. Es wäre an dieser Stelle zwar stattdessen möglich, ein Integer \textit{Quadratic} Program aufzustellen (und von Gurobi lösen zu lassen), allerdings wollten wir die Komplexität zunächst auf ein ILP beschränken.
 
 Des Weiteren haben wir zusätzlich eine Klasse von Bedingungen eingebaut, die es ermöglicht, mehrere Knoten auf dieselbe $x$- oder $y$-Koordinate zu zwingen. Dies ist vor allem auf den in Abschnitt \ref{sub:tasks} angesprochenen Wunsch zurückzuführen, mehrere Knoten aneinander "`ausrichten"' zu können.
 
-Eine weitere Optimierung, die die Zeit, die zum Lösen des Systems stark senkt, ist, dass wir die Positionen aller Knoten im Ausgangslayout an die von Gurobi verwendeten Heuristiken zum Finden einer Startlösung übergeben.
+Eine weitere Optimierung, die die zur Lösung benötigte Zeit stark senkt, ist, dass wir die Positionen aller Knoten im Ausgangslayout an die von Gurobi verwendeten Heuristiken zum Finden einer Startlösung übergeben.
 
 \subsection{Ergebnisse}
 
@@ -119,7 +119,7 @@ Wir haben den von uns entwickelten Prototypen mit einigen bereitgestellten Graph
 
 Die wichtigste Beobachtung ist, dass die Einschränkung, nur direkt benachbarte Paare von Knoten tauschen zu dürfen, für realistische Instanzgrößen unpraktikabel ist. Am Beispiel von Abbildung \ref{fig:order-too-strict} wird dies deutlich: Der schraffierte Knoten sollte an der Position, die durch das Kreuz angezeigt wird, eingefügt werden. Die Position, an der der schraffierte Knoten jetzt gezeichnet wurde, wäre vermutlich eine gute Wahl. Um hier platziert zu werden, müsste er allerdings (relativ zu der Position des Kreuzes und der links-oberen Ecken der Knoten) in der horizontalen Reihenfolge die Positionen mit den Knoten $1, 2$ und $3$ tauschen, was in diesem eingeschränkten Modell nicht möglich ist. Dieses Problem wird umso ausgeprägter, je größer die Instanzen werden. TODO mehr dazu
 
-Beobachtet haben wir außerdem, dass der neu eingefügte Knoten unserem Gefühl nach häufig zu weit von der Position, an der man ihn hat einfügen wollen, platziert wurde. Außerdem wurde unserem Gefühl nach die Möglichkeit der Skalierung gegenüber der Verschiebung von Knoten (siehe Abschnitt \ref{par:scale}) zu intensiv genutzt wurde. Dies ist zurückzuführen auf die Wahl der Konstanten $\alpha, \beta$ und $\gamma$ in der Optimierungsfunktion \ref{eqn:opt:complete}.
+Beobachtet haben wir außerdem, dass der neu eingefügte Knoten unserem Gefühl nach häufig zu weit von der Position, an der man ihn hat einfügen wollen, platziert wurde. Außerdem wurde unserem Gefühl nach die Möglichkeit der Skalierung gegenüber der Verschiebung von Knoten (siehe Abschnitt \ref{par:scale}) zu intensiv genutzt. Dies ist zurückzuführen auf die Wahl der Konstanten $\alpha, \beta$ und $\gamma$ in der Optimierungsfunktion \ref{eqn:opt:complete}.
 
 
 

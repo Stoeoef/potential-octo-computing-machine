@@ -2,25 +2,32 @@
 %%
 \label{sub:intro}
 
-In dieser Arbeit beschäftigen wir uns mit der Frage, wie Argumentkarten inkrementell gelayoutet werden können. Argumentkarten sind dabei abstrakt betrachtet gelayoutete Graphen, bei denen Knoten nicht punktförmig, sondern durch Rechtecke repräsentiert werden. Argumentkarten tragen darüber hinaus noch einiges an Semantik, so können beispielsweise Kanten entweder Unterstützung oder Angriffe von Argumenten untereinander darstellen, außerdem sind die Knoten beschriftet und sogar nummeriert. Für unsere Ansätze werden wir diese Semantik nicht benutzen.
+In dieser Arbeit beschäftigen wir uns mit der Frage, wie Argumentkarten inkrementell gelayoutet werden können. Argumentkarten sind Hilfsmittel, um komplexe Argumentationen oder Debatten darzustellen. Die Knoten in einem solchen Graphen stellen Sätze oder einzelne Thesen dar; die Kanten zeigen Beziehungen an - sie stützen andere Thesen oder Argumente, oder greifen diese an.
+ Da Argumentkarten oft die Funktion haben, eine bestehende Debatte oder einen Text abzubilden, oder ein Werkzeug bei der Strukturierung derselben sein sollen, kann es gewünscht sein, dass die Struktur der Karte wichtige Aspekte der Struktur des Vorbildes erkennen lässt: So kann es beispielsweise sein, dass die Leserichtung der Karte - also von links oben nach rechts unten - der Abfolge der entsprechenden Thesen und Argumente in einer vorhandenen Debatte oder einem Text entsprechen soll. Es kann auch sein, dass eine Reihe von zusammengehörigen Argumenten nummeriert wird, um ihre Abfolge in der zu repräsentierenden Argumentation anzuzeigen. Auch ist vorstellbar, dass die spezifische Anordnung von einigen Knoten weitere Informationen vermitteln sollen - etwa, dass diese die zentralen Thesen des Textes sind oder zwischen jenen Argumenten der zentrale Konflikt der Debatte stattfindet, dem sich die anderen Thesen und Argumente jeweils unterordnen lassen
+
+Abstrakt betrachtet sind Argumentkarten gelayoutete Graphen, bei denen Knoten nicht punktförmig, sondern durch Rechtecke repräsentiert werden.
 
 Das Problem des inkrementellen Layouts besteht darin, eine bereits existierende Argumentkarte zu verändern und für diese veränderte Argumentkarte ein neues Layout zu finden. Das neue Layout soll dabei in einer Weise gefunden werden, die die "`mentale Karte"' erhält, dass also ein menschlicher Betrachter, der die alte Karte kannte, sich in der neuen Karte schnell zurecht findet. Dies erreichen wir, indem wir die neue Karte so layouten, dass sie der alten, bekannten Karte ähnlich ist.
 
 Wir haben uns außerdem dafür entschieden, als Veränderungen der Karte ausschließlich das Hinzufügen eines einzelnen Knotens zu betrachten. Die Entfernung einer kleinen Anzahl von Knoten ist vermutlich gut durch einfaches Weglassen der Knoten umsetzbar, und daher algorithmisch nicht interessant. Die meisten anderen Operationen, wie zum Beispiel das Verschieben von Knoten, können dann als eine Aufeinanderfolge von Entfernungs- und Einfügeoperationen dargestellt werden.
 
-TODO Übersicht über die Arbeit
+In dieser Arbeit werden wir nun zunächst eine Formalisierung dieses Problems vorstellen, um dann zwei Ideen für heuristische Lösungsmöglichkeiten zu präsentieren. Danach werden wir einige Integer Linear Programs vorstellen, die das Problem unserer Meinung nach besser lösen als die angedachten Heuristiken. Abschließend präsentieren wir einige Implementation eines solchen ILPs.
 
 \subsection{Besondere Anforderungen}
 \label{sub:tasks}
 
-TODO Was wollten die Philosophen von uns?
+Für die vorliegende Arbeit ist nun besonders interessant, dass eine Argumentkarte, einmal vom Ersteller nach den oben genannten Gesichtspunkten in ein ansprechendes Layout gebracht, oft nicht in dieser Form bestehen bleibt. Argumentkarten werden in verschiedenen Versionen präsentiert, nach Diskussion überarbeitet oder verändern sich - etwa bei der Rekonstruktion laufender Debatten oder begleitend zu einem in der Entstehung befindlichen Text - sogar ständig weiter. Diese Umstände verlangen einen Layout-Algorithmus mit besondere Anforderungen: Zum Einen soll er natürlich in der Lage sein, inkrementell hinzugefügte Elemente in der Karte ästhetisch ansprechend in der bestehenden Karte unterzubringen. Zum Anderen soll die so entstandene, neue Karte aber der alten Version hinreichend ähnlich sehen, damit die oben genannten Möglichkeiten, die Struktur von Debatten oder Argumentationen mit Hilfe der Argumentkarte darzustellen, nicht verloren gehen.
+
+ So könnte es passieren, dass die Reihenfolge der Knoten sich durch die Einfügung eines einzelnen Elements massiv ändert, um Platz zu schaffen - und auch die Leserichtung nicht mehr mit beispielsweise einem Ursprungstext übereinstimmt. Auch wenn der Benutzer eine Reihe von Knoten manuell nummeriert und hierarchisch geordnet hat, um zusammengehörige Elemente anzuzeigen, kann es passieren, dass die entsprechenden Knoten durch ein erneutes Layouten plötzlich in falscher Reihenfolge angeordnet werden. Die Intention, die der Benutzer bei der Anordnung gezielt ausgewählter Knoten verfolgte, kann nicht mehr erkennbar sein, weil bei einem neuen Layout wichtige Merkmale, wie die Abstände und wechselseitige Ausrichtung dieser Knoten sich geändert hat, um ein neues Element in der Karte unterbringen zu können.
+
+ Ein Layout-Algorithmus, der diese Probleme vermeidet und die genannten Strukturierungsmöglichkeiten auch bei inkrementellem Layout mit laufend hinzukommenden, neuen Elementen beibehält, wäre für die Erstellung von Argumentkarten daher äußerst wünschenswert.
 
 %% ==============================
 \subsection{Das Problem}
 \label{sub:problem}
 %% ==============================
 
-Das Problem stellt sich aus Sicht eines Informatikers dar wie folgt. Gegeben sind:
+Das Problem stellt sich aus Sicht eines Informatikers wie folgt dar. Gegeben sind:
 
 \begin{enumerate}
   \item ein Graph $G = (V, E)$
@@ -59,7 +66,7 @@ Zusätzlich muss noch die Position des neu einzufügenden Knotens berücksichtig
 
 \begin{paragraph}{Verschiebung versus Skalierung}
   \label{par:scale}
-  Wenn wir für einen Moment davon ausgehen, dass das neue Layout nicht überlappungsfrei sein muss, so werden (eine geeignete Wahl von $\psi$ vorausgesetzt) die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic} optimiert (zu Null) dadurch, dass alle alten Knoten auf ihren Plätzen bleiben und der neue Knoten am gewünschten Punkt (mit alten Knoten überlappend) eingefügt wird. Ausgehend von diesem Layout sehen wir zwei grundlegend verschiedene Möglichkeiten, den notwendigen Platz für ein überlappungsfreies Layout zu schaffen: Zunächst können natürlich einfach einzelne Knoten verschoben werden. Dies "`verzerrt"' die relativen Positionen von Knoten und erhöht die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic}. Andererseits ist es aber auch möglich, einfach alle Kantenlängen mit einem gewissen Faktor zu multiplizieren, was dadurch, dass das Layout insgesamt größer wird, äquivalent dazu ist, die Knotengrößen kleiner zu skalieren. Diese zweite Möglichkeit erhöht ebenfalls beide Summen, wir halten dies allerdings eigentlich für falsch: Für den Betrachter ändert sich nicht die relative Lage der Knoten zueinander, die Knoten werden nur kleiner. Wir führen daher einen Skalierungsfaktor $c$ ein. Natürlich muss $c$ so gewählt werden, dass er möglichst nah an $1$ gelegen ist. Insgesamt ergibt sich somit als Optimierungsfunktion:
+  Wenn wir für einen Moment davon ausgehen, dass das neue Layout nicht überlappungsfrei sein muss, so werden (eine geeignete Wahl von $\psi$ vorausgesetzt) die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic} (zu Null) dadurch optimiert, dass alle alten Knoten auf ihren Plätzen bleiben und der neue Knoten am gewünschten Punkt (mit alten Knoten überlappend) eingefügt wird. Ausgehend von diesem Layout sehen wir zwei grundlegend verschiedene Möglichkeiten, den notwendigen Platz für ein überlappungsfreies Layout zu schaffen: Zunächst können natürlich einfach einzelne Knoten verschoben werden. Dies "`verzerrt"' die relativen Positionen von Knoten und erhöht die Summen \ref{eqn:opt:new} und \ref{eqn:opt:basic}. Andererseits ist es aber auch möglich, einfach alle Kantenlängen mit einem gewissen Faktor zu multiplizieren, was dadurch, dass das Layout insgesamt größer wird, äquivalent dazu ist, die Knotengrößen kleiner zu skalieren. Diese zweite Möglichkeit erhöht ebenfalls beide Summen, wir sind allerdings der Meinung, dass dies nicht der Fall sein sollte: Für den Betrachter ändert sich nicht die relative Lage der Knoten zueinander, die Knoten werden nur kleiner. Wir führen daher einen Skalierungsfaktor $c$ ein. Natürlich muss $c$ so gewählt werden, dass er möglichst nah an $1$ gelegen ist. Insgesamt ergibt sich somit als Optimierungsfunktion:
 \end{paragraph}
 
 \begin{align}
